@@ -1,0 +1,81 @@
+.navbar {
+  height: 60px;
+  background: linear-gradient(90deg, #0062FF 0%, #0041C4 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  color: white;
+  position: relative;
+}
+
+.hamburger {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+}
+
+.logo-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.logo {
+  height: 60px;
+}
+
+.profile-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: white;
+}
+.profile-wrapper {
+  position: relative;
+}
+
+.profile-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: 2px solid #0041C4;
+}
+
+.profile-menu {
+  position: absolute;
+  right: 0;
+  top: 45px;
+  background: white;
+  color: #000;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  padding: 0.5rem 1rem;
+  z-index: 999;
+  min-width: 160px;
+}
+
+.profile-menu p {
+  margin: 0 0 0.5rem;
+  font-weight: bold;
+}
+
+.profile-menu button {
+  width: 100%;
+  padding: 0.5rem;
+  background: #ff4d4f;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.profile-menu button:hover {
+  background: #d9363e;
+}
