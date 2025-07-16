@@ -2,6 +2,7 @@
 // src/components/Sidebar.tsx
 import React, { useEffect, useState } from "react";
 import "./css/Sidebar.css";
+import { useNavigate, useNavigation } from "react-router-dom";
 
 
 // mock user info
@@ -20,7 +21,7 @@ const fetchSidebarData = async () => {
       gradient: true,
       roles: ["admin", "user"],
       children: [
-        { id: "dashboard", label: "แดชบอร์ด", roles: ["admin", "user"] },
+        { id: "dashboard", label: "แดชบอร์ด", roles: ["admin", "user"] ,path:"/dashboard"},
       ],
     },
     {
@@ -29,8 +30,8 @@ const fetchSidebarData = async () => {
       gradient: true,
       roles: ["admin", "user"],
       children: [
-        { id: "moo1", label: "หมู่ 1", roles: ["admin", "user"] },
-        { id: "moo2", label: "หมู่ 2", roles: ["admin", "user"] },
+        { id: "moo1", label: "หมู่ 1", roles: ["admin", "user"]  ,path:"/moo/moo1"},
+        { id: "moo2", label: "หมู่ 2", roles: ["admin", "user"]  ,path:"/moo/moo2"},
       ],
     },
     {
@@ -39,14 +40,14 @@ const fetchSidebarData = async () => {
       gradient: true,
       roles: ["admin", "user"],
       children: [
-        { id: "road", label: "ถนน", roles: ["admin", "user"] },
-        { id: "water", label: "ประปา", roles: ["admin", "user"] },
-        { id: "trash", label: "ขยะ", roles: ["admin", "user", "user"] },
-        { id: "heat", label: "เหตุเดือดร้อน / รำคาญ", roles: ["admin", "user"] }, 
-        { id: "animals", label: "สัตว์จรจัด", roles: ["admin", "user"] },
-        { id: "maintenance", label: "ซ่อมแซม", roles: ["admin", "user"] }, 
-        { id: "trees", label: "ตัดต้นไม้", roles: ["admin", "user"] },
-        { id: "clean", label: "ทำความสะอสด", roles: ["admin", "user"] },
+        { id: "road", label: "ถนน", roles: ["admin", "user"]  ,path:"/complaint/road"},
+        { id: "water", label: "ประปา", roles: ["admin", "user"]  ,path:"/complaint/water"},
+        { id: "trash", label: "ขยะ", roles: ["admin", "user", "user"]  ,path:"/complaint/trash"},
+        { id: "heat", label: "เหตุเดือดร้อน / รำคาญ", roles: ["admin", "user"]  ,path:"/complaint/heat"}, 
+        { id: "animals", label: "สัตว์จรจัด", roles: ["admin", "user"]  ,path:"/complaint/animals" },
+        { id: "maintenance", label: "ซ่อมแซม", roles: ["admin", "user"]  ,path:"/complaint/maintenance"}, 
+        { id: "trees", label: "ตัดต้นไม้", roles: ["admin", "user"]  ,path:"/complaint/trees"},
+        { id: "clean", label: "ทำความสะอสด", roles: ["admin", "user"]  ,path:"/complaint/clean"},
       ],
     }, 
     {
@@ -55,8 +56,8 @@ const fetchSidebarData = async () => {
       gradient: true,
       roles: ["admin", "user"],
       children: [
-        { id: "addevent", label: "เพิ่มกิจกรรม", roles: ["admin", "user"] },
-        { id: "allevents", label: "กิจกรรมทั้งหมด", roles: ["admin", "user"] }, 
+        { id: "addevent", label: "เพิ่มกิจกรรม", roles: ["admin", "user"]  ,path:"/addevent"},
+        { id: "allevents", label: "กิจกรรมทั้งหมด", roles: ["admin", "user"]  ,path:"/allevents"}, 
       ],
     },
   ]);
@@ -64,6 +65,7 @@ const fetchSidebarData = async () => {
 
 const Sidebar: React.FC = () => {
   const [menuData, setMenuData] = useState<any[]>([]);
+  const nav = useNavigate()
 
   useEffect(() => {
     fetchSidebarData().then((data) => {
@@ -96,7 +98,7 @@ const Sidebar: React.FC = () => {
           </div>
           <ul className="submenu">
             {group.children.map((item: any) => (
-              <li key={item.id}>{item.label}</li>
+              <li key={item.id} onClick={()=>{nav(item?.path) }} >{item.label}</li>
             ))}
           </ul>
         </div>
@@ -116,45 +118,49 @@ export default Sidebar;
 
 // Mock API response
 const sidebarData = [
-  {
-    id: "group1",
-    title: "ภาพรวม",
-    type: "group",
-    gradient: true,
-    roles: ["admin", "user"],
-    children: [
-      { id: "dashboard", label: "แดชบอร์ด", roles: ["admin", "user"] },
-    ],
-  },
-  {
-    id: "group2",
-    title: "รายชื่อสมาชิก",
-    gradient: true,
-    roles: ["admin"],
-    children: [
-      { id: "moo1", label: "หมู่ 1", roles: ["admin"] },
-      { id: "moo2", label: "หมู่ 2", roles: ["admin"] },
-    ],
-  },
-  {
-    id: "group3",
-    title: "เรื่องร้องทุกข์",
-    gradient: true,
-    roles: ["admin", "user"],
-    children: [
-      { id: "road", label: "ถนน", roles: ["user", "admin"] },
-      { id: "water", label: "ประปา", roles: ["admin"] },
-      { id: "trash", label: "ขยะ", roles: ["admin", "user"] },
-    ],
-  }, 
+    {
+      id: "group1",
+      title: "ภาพรวม",
+      gradient: true,
+      roles: ["admin", "user"],
+      children: [
+        { id: "dashboard", label: "แดชบอร์ด", roles: ["admin", "user"] ,path:"/dashboard"},
+      ],
+    },
+    {
+      id: "group2",
+      title: "รายชื่อสมาชิก",
+      gradient: true,
+      roles: ["admin", "user"],
+      children: [
+        { id: "moo1", label: "หมู่ 1", roles: ["admin", "user"]  ,path:"/moo/moo1"},
+        { id: "moo2", label: "หมู่ 2", roles: ["admin", "user"]  ,path:"/moo/moo2"},
+      ],
+    },
+    {
+      id: "group3",
+      title: "เรื่องร้องทุกข์",
+      gradient: true,
+      roles: ["admin", "user"],
+      children: [
+        { id: "road", label: "ถนน", roles: ["admin", "user"]  ,path:"/complaint/road"},
+        { id: "water", label: "ประปา", roles: ["admin", "user"]  ,path:"/complaint/water"},
+        { id: "trash", label: "ขยะ", roles: ["admin", "user", "user"]  ,path:"/complaint/trash"},
+        { id: "heat", label: "เหตุเดือดร้อน / รำคาญ", roles: ["admin", "user"]  ,path:"/complaint/heat"}, 
+        { id: "animals", label: "สัตว์จรจัด", roles: ["admin", "user"]  ,path:"/complaint/animals" },
+        { id: "maintenance", label: "ซ่อมแซม", roles: ["admin", "user"]  ,path:"/complaint/maintenance"}, 
+        { id: "trees", label: "ตัดต้นไม้", roles: ["admin", "user"]  ,path:"/complaint/trees"},
+        { id: "clean", label: "ทำความสะอสด", roles: ["admin", "user"]  ,path:"/complaint/clean"},
+      ],
+    }, 
     {
       id: "group4",
       title: "งานกิจกรรม",
       gradient: true,
       roles: ["admin", "user"],
       children: [
-        { id: "addevent", label: "เพิ่มกิจกรรม", roles: ["admin", "user"] },
-        { id: "allevents", label: "กิจกรรมทั้งหมด", roles: ["admin", "user"] }, 
+        { id: "addevent", label: "เพิ่มกิจกรรม", roles: ["admin", "user"]  ,path:"/addevent"},
+        { id: "allevents", label: "กิจกรรมทั้งหมด", roles: ["admin", "user"]  ,path:"/allevents"}, 
       ],
     },
-];
+  ]

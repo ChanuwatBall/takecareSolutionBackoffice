@@ -19,6 +19,11 @@
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
+.page{
+  background-color: #F2F2F2;
+  width: 100%;
+  min-height: auto;
+}
 
 @keyframes logo-spin {
   from {

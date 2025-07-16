@@ -12,6 +12,8 @@ import Sidebar from './components/Sidebar'
 
 
 import './App.css'
+import MooID from "./page/MooID";
+import ComplaintPage from "./page/ComplaintPage";
 
 function App() { 
 
@@ -32,7 +34,7 @@ const Layout: React.FC = () => {
       {isAuthenticated() && <Navbar onToggle={toggleSidebar} />}
       <div style={{ display: "flex" }}>
         {isAuthenticated() && isSidebarOpen && <Sidebar />}
-        <div style={{ flex: 1, padding: "1rem" }}>
+        <div className="page" style={{ flex: 1 ,  }}>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={
@@ -46,6 +48,16 @@ const Layout: React.FC = () => {
                   <Dashboard />
                 </ProtectedRoute>
               }
+            />
+            <Route path="/moo/:id" element={
+                <ProtectedRoute> 
+                  <MooID /> 
+                </ProtectedRoute>} 
+            />
+            <Route path="/complaint/:id" element={
+                <ProtectedRoute> 
+                  <ComplaintPage /> 
+                </ProtectedRoute>} 
             />
           </Routes>
         </div>
