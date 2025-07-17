@@ -13,9 +13,17 @@
 } */
 
 .sidebar li {
-  padding: none;
+  padding: 3px;
+  padding-left: 5px;
   font-size: 16px;
   text-align: left;
+  border-radius: 5px;
+  max-width: 10rem;
+}
+.sidebar li:hover{
+  cursor: pointer;
+  background-color: #f5f5f5;
+
 }
 
 .sidebar {

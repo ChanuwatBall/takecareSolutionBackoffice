@@ -44,7 +44,18 @@ const ComplaintPage: React.FC = () => {
   return (
     <div style={{ background: "#f5f5f5", minHeight: "100vh", padding: "2rem" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        <h2 style={{ marginBottom: "1.5rem" }}>เรื่องร้องทุกข์</h2>
+        <div className="set-center" style={{flexDirection:"row" , justifyContent:"flex-end",marginBottom:"2rem"}} >
+            <button style={{
+                width:"fit-content" ,
+                padding:".5rem",
+                background:"#FFF",
+                fontSize:"small"
+            }} > 
+                ส่งออกเป็นไฟล์  &nbsp;
+                <img src="../icons/ionicons/chevron-down-outline.svg" style={{width:".8rem"}} /> 
+            </button>
+        </div>
+        <h2 style={{ marginBottom: "1.5rem" ,textAlign:"left" }}>เรื่องร้องทุกข์</h2>
 
         <div
           style={{
@@ -57,37 +68,48 @@ const ComplaintPage: React.FC = () => {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ textAlign: "left", fontWeight: 500, color: "#555" }}>
-                <th style={th}>รายการ</th>
+                <th style={{...th ,...{
+                    textAlign:"left" , borderRight:"1px solid rgb(246, 246, 246)"  ,
+                    boxShadow:"11px 5px 31px -26.5px rgba(0,0,0,0.6)",  
+                  }}}>รายการ</th>
                 <th style={th}>หมายเลขโทรศัพท์</th>
                 <th style={th}>หัวข้อเรื่องย่อย</th>
                 <th style={th}>รายละเอียด</th>
-                <th style={th}>ดูรูปภาพ</th>
-                <th style={th}>สถานะ</th>
+                <th style={th} className="text-center">ดูรูปภาพ</th>
+                <th style={th} className="text-center">สถานะ</th>
               </tr>
             </thead>
             <tbody>
               {paginated.map((item, index) => (
-                <tr key={item.id} style={{ borderBottom: "1px solid #eee" }}>
-                  <td style={td}>{String(index + 1 + startIdx).padStart(3, "0")}</td>
+                <tr key={item.id}  >
+                  <td style={{...td,...{
+                    textAlign:"left" , borderRight:"1px solid rgb(246, 246, 246)"  ,
+                    boxShadow:"11px 5px 31px -26.5px rgba(0,0,0,0.6)",  
+                  }}}>{String(index + 1 + startIdx).padStart(3, "0")}</td>
                   <td style={td}>{item.phone}</td>
                   <td style={td}>{item.topic}</td>
                   <td style={td}>{item.detail}</td>
-                  <td style={td}>
+                  <td style={td} className="set-center">
                     <button style={viewBtnStyle}>ดูรูปภาพ</button>
                   </td>
-                  <td style={td}>
+                  <td style={td}  >
                     <span
+                      className="set-center"
                       style={{
+                        flexDirection:"row",
+                        justifyContent:"flex-start",
                         padding: "0.25rem 0.75rem",
+                        width:"fit-content",
                         borderRadius: "999px",
                         background:
-                          item.status === "pending" ? "#fce7a2" : "#bdf3cc",
-                        color: "#333",
+                          item.status === "pending" ? "#F5EDD0" : "#C9F7DD",
+                        color: item.status === "pending" ? "#9E6300" : "#5FB088",
                         fontWeight: 500,
-                        fontSize: "0.9rem",
+                        fontSize: "smaller",
                       }}
                     >
-                      {item.status === "pending" ? "กำลังดำเนินการ" : "เสร็จเรียบร้อย"}
+                      {item.status === "pending" ? "กำลังดำเนินการ" : "เสร็จเรียบร้อย"} &nbsp;
+                      <img src="../icons/ionicons/chevron-expand-outline.svg" style={{width:".8rem"}} />
                     </span>
                   </td>
                 </tr>
@@ -110,6 +132,7 @@ const ComplaintPage: React.FC = () => {
               disabled={page === 1}
               onClick={() => setPage((p) => p - 1)}
               style={navBtnStyle}
+              className="set-center"
             >
               ◀
             </button>
@@ -120,6 +143,7 @@ const ComplaintPage: React.FC = () => {
               disabled={page === totalPages}
               onClick={() => setPage((p) => p + 1)}
               style={navBtnStyle}
+              className="set-center"
             >
               ▶
             </button>
@@ -136,17 +160,20 @@ const th: React.CSSProperties = {
 };
 
 const td: React.CSSProperties = {
-  padding: "0.75rem",
-  fontSize: "0.95rem",
+  padding: "0.5rem",
+  fontSize:"smaller",
   color: "#333",
+  textAlign:"left"
 };
 
 const viewBtnStyle: React.CSSProperties = {
   background: "#eee",
   border: "none",
   borderRadius: "12px",
-  padding: "0.4rem 1rem",
+  padding: "0.25rem 0.75rem",
   cursor: "pointer",
+  fontSize: "smaller",
+  width:"6rem"
 };
 
 const navBtnStyle: React.CSSProperties = {

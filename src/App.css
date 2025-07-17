@@ -22,7 +22,11 @@
 .page{
   background-color: #F2F2F2;
   width: 100%;
-  min-height: auto;
+  min-height: 100vh;
+}
+
+button.clear{
+  background-color: transparent;
 }
 
 @keyframes logo-spin {
@@ -46,4 +50,31 @@
 
 .read-the-docs {
   color: #888;
+}
+.text-center{ text-align: center;}
+.set-center{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes fadeIn {
+  from {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  to {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }

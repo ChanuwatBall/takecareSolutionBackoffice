@@ -2,13 +2,17 @@
 // src/components/Sidebar.tsx
 import React, { useEffect, useState } from "react";
 import "./css/Sidebar.css";
-import { useNavigate, useNavigation } from "react-router-dom";
+import { useNavigate, useNavigation, useParams } from "react-router-dom";
 
 
 // mock user info
 const currentUser = {
   role: "admin", // หรือ "admin"
-  allowedTopicIds: ["dashboard", "trash", "road" ,"water","heat","animals","maintenance", "trees", "clean"], // เฉพาะเรื่องร้องทุกข์
+  allowedTopicIds: [
+    "dashboard", 
+    "trash", 
+    "road" ,
+    "water","heat","animals","maintenance", "trees", "clean"], // เฉพาะเรื่องร้องทุกข์
 };
 
 // mock fetch
@@ -30,7 +34,7 @@ const fetchSidebarData = async () => {
       gradient: true,
       roles: ["admin", "user"],
       children: [
-        { id: "moo1", label: "หมู่ 1", roles: ["admin", "user"]  ,path:"/moo/moo1"},
+        { id: "moo1", label: "หมู่ 1 ", roles: ["admin", "user"]  ,path:"/moo/moo1"},
         { id: "moo2", label: "หมู่ 2", roles: ["admin", "user"]  ,path:"/moo/moo2"},
       ],
     },
@@ -65,7 +69,7 @@ const fetchSidebarData = async () => {
 
 const Sidebar: React.FC = () => {
   const [menuData, setMenuData] = useState<any[]>([]);
-  const nav = useNavigate()
+  const nav = useNavigate() 
 
   useEffect(() => {
     fetchSidebarData().then((data) => {
@@ -85,7 +89,7 @@ const Sidebar: React.FC = () => {
         .filter((group) => group.children.length > 0);
       setMenuData(filtered);
     });
-  }, []);
+  }, [window.location.pathname]);
 
   return (
     <aside className="sidebar">
@@ -98,7 +102,7 @@ const Sidebar: React.FC = () => {
           </div>
           <ul className="submenu">
             {group.children.map((item: any) => (
-              <li key={item.id} onClick={()=>{nav(item?.path) }} >{item.label}</li>
+              <li key={item.id} onClick={()=>{nav(item?.path) }} style={{ color: window.location.pathname.indexOf(item?.path) >-1 ? "#003592":"#535353"}}> {item.label}</li>
             ))}
           </ul>
         </div>

@@ -39,7 +39,7 @@ const Layout: React.FC = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/" element={
                 <ProtectedRoute> 
-                  <Home /> 
+                  <Dashboard /> 
                 </ProtectedRoute>} /> 
             <Route
               path="/dashboard"
