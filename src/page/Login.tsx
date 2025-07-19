@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/Login.css"; // ใช้สำหรับใส่ CSS ปุ่ม
 import Alert from "../components/Alert";
-import { getDefaultCompay } from "../action";
+import { getCookie, getDefaultCompay, login, setCookie } from "../action";
+import Cookies from 'js-cookie';
 
 const Login=()=>{
     const [isOpen, setIsOpen] = useState(false);
@@ -12,23 +13,32 @@ const Login=()=>{
     const [passtype , setPassType] = useState("password") 
     const [message , setMessage] = useState("")
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // 🔐 ตรวจสอบ login แบบง่าย (mock)
-        if ((username && password) && (username.match("admin") && password.match("123456"))) {
-            localStorage.setItem("token", "fake-token");
-            // navigate("/");
-            window.location.href = "/"
-        } else if ((username && password) && ( !username.match("admin") ||  !password.match("123456"))) {
-            // alert("Username  หรือ Password ไม่ถูกต้อง !! โปรดลองใหม่อีกครั้ง");
-            setMessage("Username  หรือ Password ไม่ถูกต้อง !! โปรดลองใหม่อีกครั้ง")
-            setIsOpen(true)
-        } else {
-            // alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+        if (username && password){
+            const result = await login({username , password , company: 1})
+            console.log("login result ",result)
+
+
+            if(result){ 
+                // ✅ เก็บ token ใน cookie 1 วัน
+                localStorage.setItem("token", result.token)
+                setCookie('auth_token', result.token,  1 );
+                setCookie('login',  {username , password} ,  7 );
+
+                // ✅ เก็บ user info ทั้งหมด (ถ้าจำเป็น)
+                setCookie('user_info',  result ,  1  );
+                window.location.href = "/"
+            }else{
+                setMessage("Username  หรือ Password ไม่ถูกต้อง !! โปรดลองใหม่อีกครั้ง")
+                setIsOpen(true)
+            }
+       }else{
             setMessage("กรุณากรอกข้อมูลให้ครบถ้วน")
             setIsOpen(true)
-        }
+       }
+        
     };
 
     const viewPassword=()=>{  
@@ -45,6 +55,13 @@ const Login=()=>{
             console.log("result ",result)
         }
         findCom()
+        const checkLogin=async()=>{ 
+            const token = await getCookie('auth_token');
+            if(token){ 
+                window.location.href = "/"
+            }
+        }
+        checkLogin()
     },[])
 
     return(

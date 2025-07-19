@@ -1,0 +1,29 @@
+.accordion-menu {
+  font-family: sans-serif;
+  font-size:  medium;
+  text-align: left;
+  padding: 1rem .5rem 1rem .5rem;
+}
+.wrap-subdistrict{
+    border-bottom: 1px solid #e7e7e7;
+    transition-duration: 300ms;
+}
+.subdistrict{
+    cursor:  pointer ;
+    /* font-weight:  bold ; */
+    margin-bottom: 4 ;
+    padding: .5rem  ;
+}
+.icon-carret{
+    width: .9rem;
+    transition-duration: 300ms;
+}
+.icon-carret.open{
+    transform: rotate(90deg);
+}
+.village{ font-size: medium;  width: 100%;}
+.village:hover {
+    color: #4d4c4c;
+    
+}
+ 
