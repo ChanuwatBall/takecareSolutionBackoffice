@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/Login.css"; // ใช้สำหรับใส่ CSS ปุ่ม
 import Alert from "../components/Alert";
+import { getDefaultCompay } from "../action";
 
 const Login=()=>{
     const [isOpen, setIsOpen] = useState(false);
@@ -37,6 +38,14 @@ const Login=()=>{
             setPassType("password")
         }
     }
+
+    useEffect(()=>{
+        const findCom=async()=>{
+            const result = await getDefaultCompay()
+            console.log("result ",result)
+        }
+        findCom()
+    },[])
 
     return(
       <div className="login-container">
@@ -91,3 +100,4 @@ const Login=()=>{
 }
 
 export default Login;
+ 
