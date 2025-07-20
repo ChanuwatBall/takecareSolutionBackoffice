@@ -7,12 +7,15 @@
 .wrap-subdistrict{
     border-bottom: 1px solid #e7e7e7;
     transition-duration: 300ms;
+  max-width: 12rem;
+  color: #333; 
 }
 .subdistrict{
     cursor:  pointer ;
     /* font-weight:  bold ; */
     margin-bottom: 4 ;
     padding: .5rem  ;
+  color: #333; 
 }
 .icon-carret{
     width: .9rem;
@@ -21,9 +24,11 @@
 .icon-carret.open{
     transform: rotate(90deg);
 }
-.village{ font-size: medium;  width: 100%;}
-.village:hover {
-    color: #4d4c4c;
+/* .village{ color: #333; } */
+.village:hover { 
+  color: #333; 
     
 }
- 
+ .village span{
+    font-size: 1em;
+ }

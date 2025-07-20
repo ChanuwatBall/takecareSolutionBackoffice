@@ -10,8 +10,11 @@ const api = axios.create({
     }, 
 })
 
-function encodeBase64(str: string): string {
+export function encodeBase64(str: string): string {
   return btoa(unescape(encodeURIComponent(str)));
+} 
+export function decodeBase64(base64: string): string {
+  return decodeURIComponent(escape(atob(base64)));
 }
 
 export const getDefaultCompay=async()=>{
@@ -66,6 +69,24 @@ export async function getMemberdetail() {
     const token = await getCookie("auth_token")
     console.log("token ",token)
     const response = await api.post( "memberdetail" , {}, { 
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return null
+  }
+}
+
+
+export async function getVillagersByVillage({id}:any) {
+    try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.post( "villager/list" , {id:id}, { 
       headers: { 
         token: "Basic "+token
       }

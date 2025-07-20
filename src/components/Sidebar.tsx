@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import "./css/Sidebar.css";
 import { useNavigate, useNavigation, useParams } from "react-router-dom";
-import { getCookie, getMemberdetail, getSubdistrict } from "../action";
+import { encodeBase64, getCookie, getMemberdetail, getSubdistrict } from "../action";
 import AccordionMenu from "./AccordionMenu";
 
 
@@ -137,7 +137,7 @@ const Sidebar: React.FC = () => {
           >
             รายชื่อสมาชิก
           </div>
-         <AccordionMenu data={tumbonMooMember} select={(id:any)=>{nav("/moo/"+id)}} /> 
+         <AccordionMenu data={tumbonMooMember} select={(id:any)=>{nav("/moo/"+encodeBase64(id))}} /> 
         </div>
 
          <div   className="menu-group">
@@ -150,6 +150,24 @@ const Sidebar: React.FC = () => {
             {complaintMenu.map((item: any) => (
               <li key={item.id} onClick={()=>{nav(item?.path) }} style={{ color: window.location.pathname.indexOf(item?.path) >-1 ? "#003592":"#535353"}}> {item.label}</li>
             ))}
+          </ul>
+        </div>
+
+        <div   className="menu-group">
+          <div
+            className={`menu-title  gradient-bg `}
+          >
+            งานกิจกรรม
+          </div>
+          <ul className="submenu"> 
+             <li  onClick={()=>{nav("/activities") }} 
+                  style={{ color: window.location.pathname.indexOf("/activities") >-1 ? "#003592":"#535353"}}> 
+                กิจกรรมทั้งหมด
+              </li>
+              <li  onClick={()=>{nav("/activity/add") }} 
+                  style={{ color: window.location.pathname.indexOf("/activity/add") >-1 ? "#003592":"#535353"}}> 
+                 เพิ่มกิจกรรม
+              </li>
           </ul>
         </div>
 
@@ -167,7 +185,7 @@ const Sidebar: React.FC = () => {
           </ul>
         </div>
       ))}
-       <div  className="menu-group">
+       <div  className="menu-group" onClick={()=>{nav("/setting")}}>
           <div
             className={`menu-title  second-gradient `}
           >

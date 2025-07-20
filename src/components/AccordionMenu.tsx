@@ -32,12 +32,12 @@ const AccordionMenu: React.FC<Props> = ({ data ,select }) => {
   };
 
   useEffect(()=>{ 
-    setTimeout(()=>{
-        if(data.length > 0 ){ 
-          handleToggle(data[0].id)
-        }
-    },1000)
-  },[])
+    // setTimeout(()=>{ 
+    //     if(data.length > 0 ){  
+    //       setOpenId(id =>( id = data[0].id))
+    //     }
+    // },1000)
+  },[data])
 
   return (
     <div className="accordion-menu">
@@ -45,10 +45,9 @@ const AccordionMenu: React.FC<Props> = ({ data ,select }) => {
         <div key={sub.id}  className='wrap-subdistrict' >
           <div 
             className='subdistrict'
-            style={{ }}
+            style ={{ fontSize:".9em" , color: "#333" }} 
             onClick={() => handleToggle(sub.id)}
-          >
-            {/* {openId === sub.id ? '▼' : '▶'}  */}
+          > 
             <img src="../icons/ionicons/caret-forward.svg" className={'icon-carret '+ (openId=== sub.id ? "open":"close") } />
             {sub.subdistrict}
           </div>
@@ -58,11 +57,10 @@ const AccordionMenu: React.FC<Props> = ({ data ,select }) => {
               {sub.villages.map((village) => (
                 <div className='village' key={village.id} style={{ marginBottom: 4 }}>
                   <span
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: 'pointer' , fontSize:".9em" , color: "#333" }}
                     onClick={() => handleVillageToggle(village.id)}
                   >
-                     <img src="../icons/ionicons/caret-forward.svg" className={'icon-carret '} />
-                    {/* {openVillageId === village.id ? '▼' : '▶'}  */}
+                     <img src="../icons/ionicons/caret-forward.svg" className={'icon-carret '} /> 
                     {village.name}
                   </span>
                 </div>
@@ -82,8 +80,7 @@ const AccordionMenu: React.FC<Props> = ({ data ,select }) => {
                     style={{ cursor: 'pointer' }}
                     onClick={() => handleVillageToggle(village.id)}
                   >
-                     <img src="../icons/ionicons/caret-forward.svg" className={'icon-carret '} />
-                    {/* {openVillageId === village.id ? '▼' : '▶'}  */}
+                     <img src="../icons/ionicons/caret-forward.svg" className={'icon-carret '} /> 
                     {village.name}
                   </span>
                 </div>
