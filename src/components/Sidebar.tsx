@@ -88,20 +88,7 @@ const Sidebar: React.FC = () => {
       const user = await getMemberdetail() //getCookie("user_info")
       console.log("user ",user)
       setUser(user)
-      // filter กลุ่มที่ user มีสิทธิ์
-      // const filtered = data
-      //   .filter((group) => group.roles.includes(user.role))
-      //   .map((group) => ({
-      //     ...group,
-      //     children: group.children.filter(
-      //       (item: any) =>
-      //         item.roles.includes(user.role) &&
-      //         (group.id === "group3"
-      //           ? user.allowedTopicIds.includes(item.id)
-      //           : true)
-      //     ),
-      //   }))
-      //   .filter((group) => group.children.length > 0);
+      
       const filtered = complaintMenu.filter((menu)=> user?.allowedTopicIds.includes(menu?.id))
       console.log("filtered ",filtered)
       setComplaintMenu(filtered);
@@ -164,8 +151,8 @@ const Sidebar: React.FC = () => {
                   style={{ color: window.location.pathname.indexOf("/activities") >-1 ? "#003592":"#535353"}}> 
                 กิจกรรมทั้งหมด
               </li>
-              <li  onClick={()=>{nav("/activity/add") }} 
-                  style={{ color: window.location.pathname.indexOf("/activity/add") >-1 ? "#003592":"#535353"}}> 
+              <li  onClick={()=>{nav("/activity/form") }} 
+                  style={{ color: window.location.pathname.indexOf("/activity/form") >-1 ? "#003592":"#535353"}}> 
                  เพิ่มกิจกรรม
               </li>
           </ul>

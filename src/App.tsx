@@ -14,6 +14,8 @@ import Sidebar from './components/Sidebar'
 import './App.css'
 import MooID from "./page/MooID";
 import ComplaintPage from "./page/ComplaintPage";
+import ActivityForm from "./page/ActivityForm";
+import Activities from "./page/Activities";
 
 function App() { 
 
@@ -59,6 +61,19 @@ const Layout: React.FC = () => {
                   <ComplaintPage /> 
                 </ProtectedRoute>} 
             />
+             <Route path="/activity/form" element={
+                <ProtectedRoute> 
+                  <ActivityForm /> 
+                </ProtectedRoute>} 
+            />
+
+            <Route path="/activities" element={
+                <ProtectedRoute> 
+                  <Activities /> 
+                </ProtectedRoute>} 
+            />
+
+            
           </Routes>
         </div>
       </div>

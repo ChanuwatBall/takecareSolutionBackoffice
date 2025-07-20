@@ -6,7 +6,7 @@ const api = axios.create({
     baseURL: apiUrl  ,
     headers: {
         Authorization: "Bearer "+token ,
-        'Content-Type': 'application/json',
+        // 'Content-Type': 'application/json',
     }, 
 })
 
@@ -61,7 +61,7 @@ export async function getSubdistrict() {
     return response.data;
   } catch (error: any) {
     console.error('POST failed:', error.message);
-    return null
+    return []
   }
 }
 export async function getMemberdetail() {
@@ -99,6 +99,41 @@ export async function getVillagersByVillage({id}:any) {
   }
 }
 
+export async function createActivity(formData:any) {
+    try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.post( "activity/create" ,formData, { 
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return null
+  }
+}
+///activity/create
+
+/// 
+export async function getActivities() {
+    try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.get( "activities" , { 
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return null
+  }
+}
  
 
 export async function setCookie(name: string, value: any, days: number) {
