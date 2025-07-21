@@ -134,6 +134,24 @@ export async function getActivities() {
     return null
   }
 }
+export async function updateActivityStatus(body:any) {
+    try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.post( "activity/updatestatus",body , { 
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return null
+  }
+}
+
+
  
 
 export async function setCookie(name: string, value: any, days: number) {

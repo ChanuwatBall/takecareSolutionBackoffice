@@ -4,9 +4,12 @@
   /* padding: 2rem; */
   text-align: center;
   width: 100vw;
-   height: 100vh;
-  
+  height: 100vh;
+  color: #4D4D4D !important;
 } 
+label , p , b ,u , i ,strong , h1 ,h2,h3,h4,h5,h6,div,span{ 
+   color: #4D4D4D ;
+}
 .logo {
   height: 6em;
   padding: 1.5em;

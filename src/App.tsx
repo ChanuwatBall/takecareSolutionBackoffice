@@ -16,11 +16,17 @@ import MooID from "./page/MooID";
 import ComplaintPage from "./page/ComplaintPage";
 import ActivityForm from "./page/ActivityForm";
 import Activities from "./page/Activities";
+import { AlertProvider } from "./components/AlertContext";
+import Setting from "./page/Setting";
+import MemberSettings from "./page/MemberSettings";
+
 
 function App() { 
 
   return ( 
+    <AlertProvider> 
       <Layout /> 
+    </AlertProvider>
   )
 }
 
@@ -72,6 +78,18 @@ const Layout: React.FC = () => {
                   <Activities /> 
                 </ProtectedRoute>} 
             />
+
+             <Route path="/setting" element={
+                <ProtectedRoute> 
+                  <Setting /> 
+                </ProtectedRoute>} 
+            />
+            <Route path="/setting/members" element={
+                <ProtectedRoute> 
+                  <MemberSettings /> 
+                </ProtectedRoute>} 
+            />
+            
 
             
           </Routes>
