@@ -1,47 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import './css/MemberSettingsPage.css';
+import { addMember, getMembers } from '../action';
+import { useAlert } from '../components/AlertContext';
 
 const columns = [
   { key: 'name', label: 'ชื่อ-นามสกุล' },
   { key: 'email', label: 'อีเมล' },
-  { key: 'phone_number', label: 'หมายเลขโทรศัพท์' },
+  { key: 'phoneNumber', label: 'หมายเลขโทรศัพท์' },
   { key: 'username', label: 'Username', hidden: true },
   { key: 'password', label: 'Password', hidden: true },
   { key: 'role', label: 'Role', hidden: true },
   { key: 'allowedTopicIds', label: 'หัวข้อร้องเรียน', hidden: true }
 ];
+ 
+const complaintTitile = [ 
+    {value:"trash" , label:"ขยะ"},
+    {value:"road"  , label:"ถนน"},
+    {value: "water" , label:"น้ำประปา"},
+    {value:"heat" , label:"เหตุเดือดร้อน / รำคาญ"},
+    {value:"animals" , label:"สัตว์จรจัด"},
+    {value:"maintenance" , label:"ซ่อมแซม"},
+    {value: "trees" , label:"ตัดต้นไม้"},
+    {value: "clean" , label:"ความสะอาด"},
+    {value: "other", label:"อื่นๆ"}
+  ]
+const roles = [
+    {value:"admin" , label:"Admin"},
+    {value:"user" , label:"User"},
 
-const dummyData = [
-  {
-    id: 1,
-    name: 'Super Admin',
-    username: 'admin',
-    password: 'superadmin',
-    role: 1,
-    allowedTopicIds: ['trash', 'water'],
-    phone_number: '-',
-    email: '-'
-  },
-  {
-    id: 2,
-    name: 'Suppakit',
-    username: 'suppakit',
-    password: '123456',
-    role: 3,
-    allowedTopicIds: ['trash', 'water'],
-    phone_number: '0900000000',
-    email: 'suppakit01@gmail.com'
-  }
-];
-
+]
 const MemberSettings = () => {
-  const [members, setMembers] = useState(dummyData);
+  const [members, setMembers] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [visibleCols, setVisibleCols] = useState(columns);
   const [showAddModal, setShowAddModal] = useState(false);
   const [filter,setFilter] = useState(false)
 
-  const [topicChoise , setTopicChoise] = useState([ "trash","road" , "water","heat","animals","maintenance", "trees", "clean", "other"])
+  const [topicChoise , setTopicChoise] = useState(complaintTitile)
  
   const [fullname , setFullName] = useState("")
   const [email , setEmail] = useState("")
@@ -49,16 +44,19 @@ const MemberSettings = () => {
   const [username , setUsername] = useState("")
   const [password , setPassword] = useState("")
   const [role , setRole] = useState("")
-  const [topic  , setTopic] = useState([])
+  const [topic  , setTopic] = useState<any[]>([])
   const [topicStr , setTopicStr] = useState("")
+  const [showAlert] = useAlert();
 
-    // <input placeholder="ชื่อ-นามสกุล"  />
-    //           <input placeholder="Email" />
-    //           <input placeholder="Phone Number" />
-    //           <input placeholder="Username" />
-    //           <input placeholder="Password" />
-    //           <input placeholder="Role" />
-    //           <input placeholder="Allowed Topics 
+   
+  useEffect(()=>{ 
+    const getmemnbers=async()=>{
+      const members = await getMembers()
+      console.log("members ",members)
+      setMembers(members)
+    }
+    getmemnbers()
+  },[])
 
   const toggleColumn = (key:any) => {
     setVisibleCols((prev) =>
@@ -72,8 +70,37 @@ const MemberSettings = () => {
     (m) =>
       m.name.includes(search) ||
       m.email.includes(search) ||
-      m.phone_number.includes(search)
+      m.phoneNumber.includes(search)
   );
+
+
+  const handleChange = (value: string) => {
+    setTopic((prev) =>
+      prev.includes(value)
+        ? prev.filter((v) => v !== value)
+        : [...prev, value]
+    );
+  };
+
+  const submit=async ()=>{
+    const form ={
+      fullname ,
+      email ,  
+      phone , 
+      username ,  
+      password , 
+      role ,  
+      topic  ,  
+    }
+    const result= await addMember(form)
+    if(result?.result){ 
+       showAlert('เพิ่มเจ้าหน้าที่สำเร็จ', 'success')
+       setShowAddModal(false)
+     }else{
+      showAlert('เพิ่มเจ้าหน้าที่ไม่สำเร็จ',"error")
+     }
+    console.log( " submit add form ",form)
+  }
 
   return (
     <div className="member-settings">
@@ -131,16 +158,20 @@ const MemberSettings = () => {
                 {visibleCols.map(
                   (col) =>
                     !col.hidden && (
-                      <td key={col.key}>
+                      <td key={col.key} className='text-left' style={{textAlign:"left"}} >
                         {Array.isArray(member[col.key])
                           ? member[col.key].join(', ')
                           : member[col.key]}
                       </td>
                     )
                 )}
-                <td className="actions">
-                  <button className="icon-btn">✏️</button>
-                  <button className="icon-btn">🗑️</button>
+                <td className="actions" style={{width:"5%"}}>
+                  <button className="icon-btn">
+                    <img style={{width:"1rem"}} src="../icons/ionicons/create-outline.svg" />
+                  </button>
+                  <button className="icon-btn">
+                    <img style={{width:"1rem"}} src="../icons/ionicons/trash-outline.svg" /> 
+                  </button>
                 </td>
               </tr>
             ))}
@@ -152,17 +183,32 @@ const MemberSettings = () => {
         <div className="modal">
           <div className="modal-content">
             <h3>เพิ่มเจ้าหน้าที่</h3>
-            <div>
-              {/* Add fields from member table */}
-              <input placeholder="ชื่อ-นามสกุล" value={fullname} onChange={(e:any)=>{setFullName(e.target.value) }} />
-              <input placeholder="Email"  value={email} onChange={(e:any)=>{setEmail(e.target.value)}} />
-              <input placeholder="Phone Number"  value={phone} onChange={(e:any)=>{setPhone(e.target.value)}} />
-              <input placeholder="Username"  value={username} onChange={(e:any)=>{setUsername(e.target.value)}}  />
-              <input placeholder="Password"  value={password} onChange={(e:any)=>{setPassword(e.target.value)}}  />
-              <input placeholder="Role"  value={role} onChange={(e:any)=>{}}  />
-              <input placeholder="Allowed Topics (comma-separated)" />
+            <div> 
+              <input placeholder="ชื่อ-นามสกุล" type="text" value={fullname} onChange={(e:any)=>{setFullName(e.target.value) }} />
+              <input placeholder="Email" type="text" value={email} onChange={(e:any)=>{setEmail(e.target.value)}} />
+              <input placeholder="Phone Number" type="text"  value={phone} onChange={(e:any)=>{setPhone(e.target.value)}} />
+              <input placeholder="Username" type="text" value={username} onChange={(e:any)=>{setUsername(e.target.value)}}  />
+              <input placeholder="Password" type="text"  value={password} onChange={(e:any)=>{setPassword(e.target.value)}}  />
+               
+                <select className='input' aria-placeholder='Role' style={{width:"92%" }} value={role} onChange={(e)=>{setRole(e.target.value)}} >
+                  {roles.map((r:any, index:any)=>  <option key={index} value={r.value}> { r.label } </option>) } 
+                </select>
+              
+              <label className='text-left' style={{marginLeft:"1rem",fontSize:".9em"}}>Allowed Topics</label>
+              
+              <div style={{width:"100%" , padding:"0 .5rem 0 .5rem"}} >
+                {
+                  topicChoise.map((e:any,index:any)=> <div key={index} style={{textAlign:"left", float:"left" ,padding:"0 .5rem 0 .5rem"}}>
+                  <input
+                    type="checkbox" 
+                    checked={topic.includes(e.value)}
+                    onChange={() => handleChange(e.value)}
+                  />  {e.label} </div>
+                  )
+                }
+              </div> 
               <div className="modal-actions">
-                <button type="submit">บันทึก</button>
+                <button type="submit" onClick={()=>{submit() }} >บันทึก</button>
                 <button type="button" onClick={() => setShowAddModal(false)}>
                   ยกเลิก
                 </button>

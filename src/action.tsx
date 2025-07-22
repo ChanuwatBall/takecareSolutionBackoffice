@@ -66,7 +66,7 @@ export async function getSubdistrict() {
 }
 export async function getMemberdetail() {
     try {
-    const token = await getCookie("auth_token")
+    const token = await getCookie("auth_token") 
     console.log("token ",token)
     const response = await api.post( "memberdetail" , {}, { 
       headers: { 
@@ -80,6 +80,41 @@ export async function getMemberdetail() {
     return null
   }
 }
+
+export async function getMembers() {
+    try {
+    const token = await getCookie("auth_token") 
+    console.log("token ",token)
+    const response = await api.post( "members" , {}, { 
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return null
+  }
+}
+export async function addMember(body:any) {
+    try {
+    const token = await getCookie("auth_token") 
+    console.log("token ",token)
+    const response = await api.post( "member/add" , body , { 
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return null
+  }
+}
+///member/add
+
 
 
 export async function getVillagersByVillage({id}:any) {
