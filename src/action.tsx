@@ -3,7 +3,7 @@ const apiUrl = import.meta.env.VITE_API;
 const token = import.meta.env.VITE_TOKEN;
 
 const api = axios.create({
-    baseURL: apiUrl  ,
+    baseURL: apiUrl+"/api/backoffice"  ,
     headers: {
         Authorization: "Bearer "+token ,
         // 'Content-Type': 'application/json',
@@ -112,8 +112,23 @@ export async function addMember(body:any) {
     console.error('POST failed:', error.message);
     return null
   }
-}
-///member/add
+} 
+export async function deleteMember(body:any) {
+    try {
+    const token = await getCookie("auth_token") 
+    console.log("token ",token)
+    const response = await api.post( "member/delete" , body , { 
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return null
+  }
+} 
 
 
 
@@ -186,7 +201,7 @@ export async function updateActivityStatus(body:any) {
   }
 }
 
-
+//deleteMember
  
 
 export async function setCookie(name: string, value: any, days: number) {

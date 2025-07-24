@@ -67,12 +67,12 @@ const ComplaintPage: React.FC = () => {
         >
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ textAlign: "left", fontWeight: 500, color: "#555" }}>
+              <tr style={{ textAlign: "left", fontWeight: 500, color: "#555" , backgroundColor:"none" }}>
                 <th style={{...th ,...{
-                    textAlign:"left" , borderRight:"1px solid rgb(246, 246, 246)"  ,
-                    boxShadow:"11px 5px 31px -26.5px rgba(0,0,0,0.6)",  
+                    textAlign:"center" , borderRight:"1px solid rgb(246, 246, 246)"  ,
+                    boxShadow:"7px 2px 14px -8px rgba(0,0,0,0.2)", 
                   }}}>รายการ</th>
-                <th style={th}>หมายเลขโทรศัพท์</th>
+                <th style={{...th, ...{paddingLeft:"1.5rem"}}}>หมายเลขโทรศัพท์</th>
                 <th style={th}>หัวข้อเรื่องย่อย</th>
                 <th style={th}>รายละเอียด</th>
                 <th style={th} className="text-center">ดูรูปภาพ</th>
@@ -82,11 +82,18 @@ const ComplaintPage: React.FC = () => {
             <tbody>
               {paginated.map((item, index) => (
                 <tr key={item.id}  >
-                  <td style={{...td,...{
-                    textAlign:"left" , borderRight:"1px solid rgb(246, 246, 246)"  ,
-                    boxShadow:"11px 5px 31px -26.5px rgba(0,0,0,0.6)",  
-                  }}}>{String(index + 1 + startIdx).padStart(3, "0")}</td>
-                  <td style={td}>{item.phone}</td>
+                  <td style={{...td,...{ 
+                    position:"relative",
+                    textAlign:"center"  
+                  }}}>
+                    <div className="text-center" style={{width:"90%",height:"100%",zIndex:5,position:"absolute"}} >    
+                      <label  >{String(index + 1 + startIdx).padStart(3, "0")}</label>
+                    </div>
+                 
+                   {index == 0 && <div style={{width:"100%",height:( paginated.length+1)+"00%",  position:"absolute",top:"0",zIndex: 0,left:0,
+                      boxShadow:"7px 2px 14px -8px rgba(0,0,0,0.1)",background:"#FFF" ,  }} ></div>}
+                  </td>
+                  <td style={{...td, ...{paddingLeft:"1.5rem"}}}>{item.phone}</td>
                   <td style={td}>{item.topic}</td>
                   <td style={td}>{item.detail}</td>
                   <td style={td} className="set-center">
@@ -99,6 +106,7 @@ const ComplaintPage: React.FC = () => {
                         flexDirection:"row",
                         justifyContent:"flex-start",
                         padding: "0.25rem 0.75rem",
+                        minWidth:"5.8rem" ,
                         width:"fit-content",
                         borderRadius: "999px",
                         background:
@@ -157,13 +165,15 @@ const ComplaintPage: React.FC = () => {
 const th: React.CSSProperties = {
   padding: "0.75rem",
   fontSize: "1rem",
+  backgroundColor:"none"
 };
 
 const td: React.CSSProperties = {
   padding: "0.5rem",
   fontSize:"smaller",
   color: "#333",
-  textAlign:"left"
+  textAlign:"left",
+  borderBottom:"none"
 };
 
 const viewBtnStyle: React.CSSProperties = {

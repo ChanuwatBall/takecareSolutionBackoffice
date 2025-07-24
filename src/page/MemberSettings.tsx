@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './css/MemberSettingsPage.css';
-import { addMember, getMembers } from '../action';
+import { addMember, deleteMember, getMembers } from '../action';
 import { useAlert } from '../components/AlertContext';
+import Alert from '../components/Alert';
 
 const columns = [
   { key: 'name', label: 'ชื่อ-นามสกุล' },
@@ -26,9 +27,20 @@ const complaintTitile = [
   ]
 const roles = [
     {value:"admin" , label:"Admin"},
-    {value:"user" , label:"User"},
-
+    {value:"user" , label:"User"}, 
 ]
+interface Member{
+    "id":  number
+    "name": string
+    "username": string
+    "password": string | any
+    "email":  string
+    "phoneNumber": string
+    "allowedTopicIds": string[]
+    "companyId":  number
+    "role": string
+    "token": string | any
+}
 const MemberSettings = () => {
   const [members, setMembers] = useState<any[]>([]);
   const [search, setSearch] = useState('');
@@ -36,7 +48,10 @@ const MemberSettings = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [filter,setFilter] = useState(false)
 
+  const [member,setMember] = useState<Member | null>(null)
   const [topicChoise , setTopicChoise] = useState(complaintTitile)
+  const [isOpen ,setIsOpen ] = useState(false)
+  const [message ,setMessage ] = useState("")
  
   const [fullname , setFullName] = useState("")
   const [email , setEmail] = useState("")
@@ -49,12 +64,13 @@ const MemberSettings = () => {
   const [showAlert] = useAlert();
 
    
+  const getmemnbers=async()=>{
+    const members = await getMembers()
+    console.log("members ",members)
+    setMembers(members)
+  }
+
   useEffect(()=>{ 
-    const getmemnbers=async()=>{
-      const members = await getMembers()
-      console.log("members ",members)
-      setMembers(members)
-    }
     getmemnbers()
   },[])
 
@@ -82,11 +98,40 @@ const MemberSettings = () => {
     );
   };
 
+  const deleteMemberHandler=async ()=>{
+    const result = await deleteMember(member)
+     if(result?.result){
+       getmemnbers()
+       showAlert('ลบ'+member?.name+'สำเร็จ', 'success')
+     }else{
+      showAlert('ลบ'+member?.name+'ไม่สำเร็จ',"error")
+     }
+  }
+
+  const setupForm=(member:Member)=>{
+    setFullName(member?.name)
+    setEmail(member?.email)
+    setPhone(member?.phoneNumber)
+    setUsername(member?.username)
+    setPassword(member?.password)
+    setRole(member?.role)
+    setTopic(member?.allowedTopicIds)
+  }
+  const clearForm=()=>{
+    setFullName("")
+    setEmail("")
+    setPhone("")
+    setUsername("")
+    setPassword("")
+    setRole("")
+    setTopic([])
+  }
+
   const submit=async ()=>{
     const form ={
-      fullname ,
+      name: fullname ,
       email ,  
-      phone , 
+      phoneNumber: phone , 
       username ,  
       password , 
       role ,  
@@ -166,10 +211,10 @@ const MemberSettings = () => {
                     )
                 )}
                 <td className="actions" style={{width:"5%"}}>
-                  <button className="icon-btn">
+                  <button className="icon-btn" onClick={()=>{setMember(member);setupForm(member);setShowAddModal(true); console.log("member ",member)}} >
                     <img style={{width:"1rem"}} src="../icons/ionicons/create-outline.svg" />
                   </button>
-                  <button className="icon-btn">
+                  <button className="icon-btn" onClick={()=>{setMember(member);setMessage("ยืนยันลบเจ้าหน้าที่ "+member?.name); setIsOpen(true)}}  >
                     <img style={{width:"1rem"}} src="../icons/ionicons/trash-outline.svg" /> 
                   </button>
                 </td>
@@ -209,7 +254,7 @@ const MemberSettings = () => {
               </div> 
               <div className="modal-actions">
                 <button type="submit" onClick={()=>{submit() }} >บันทึก</button>
-                <button type="button" onClick={() => setShowAddModal(false)}>
+                <button type="button" onClick={() =>{clearForm(); setShowAddModal(false) }}>
                   ยกเลิก
                 </button>
               </div>
@@ -217,6 +262,27 @@ const MemberSettings = () => {
           </div>
         </div>
       )}
+
+       <Alert
+        isOpen={isOpen}
+        setOpen={setIsOpen}
+        title="แจ้งเตือน"
+        message={message}
+        buttons={[
+            {
+            text: "ยกเลิก",
+            role: "cancel",
+              handler: () => console.log("Cancel"),
+            },
+            {
+            text: "ตกลง",
+            role: "confirm",
+              handler: () => {
+                deleteMemberHandler()
+              }
+            },
+        ]}
+        />
     </div>
   );
 };

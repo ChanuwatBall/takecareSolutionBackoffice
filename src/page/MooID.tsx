@@ -90,8 +90,7 @@ import { decodeBase64, getVillagersByVillage } from "../action";
           <h1 style={{ fontSize: "2.5rem", fontWeight: "600", margin: 0 }}>
             {members.length.toLocaleString()}
           </h1>
-        </div>
-
+        </div> 
         {/* ช่องค้นหา */}
         <div
           style={{
@@ -131,6 +130,7 @@ import { decodeBase64, getVillagersByVillage } from "../action";
             padding: "1.5rem",
             boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
             overflowX: "auto",
+            minHeight:"15rem"
           }}
         >
           <table style={{ width: "100%", borderCollapse: "collapse",fontSize:".8em" }}>
@@ -144,14 +144,13 @@ import { decodeBase64, getVillagersByVillage } from "../action";
                   <th style={thStyle} >อายุ</th>
                   <th style={thStyle} >อีเมลล์</th> 
                   <th style={thStyle} >เพศ</th> 
-                  <th style={{...thStyle,...{  
-                      borderLeft:"1px solid rgb(235, 235, 235)"  ,
-                      boxShadow:" -18px -5px 15px -22px rgba(0,0,0,0.3)", 
+                  <th style={{...thStyle,...{   
+                      boxShadow:"-18px -5px 15px -22px rgba(0,0,0,0.1)", 
                   }}}> </th>
               </tr>
             </thead>
             <tbody>
-              {filteredMembers.map((v) => (
+              {filteredMembers.map((v,index) => (
                 <tr key={v.id}>
                   <td style={tdStyle}>{v.lineName}</td>
                   <td style={tdStyle}>{v.phoneNumber}</td>
@@ -160,29 +159,33 @@ import { decodeBase64, getVillagersByVillage } from "../action";
                   <td style={tdStyle}>{calculateAge(v.birthDate)}</td>   
                   <td style={tdStyle}>{v.email}</td> 
                   <td style={tdStyle}>{genderText(v.gender)}</td> 
-                  <th style={{...tdStyle,...{  
-                      borderLeft:"1px solid rgb(235, 235, 235)"  ,
+                  <th style={{...tdStyle,...{   
                       boxShadow:" -18px -5px 15px -22px rgba(0,0,0,0.3)", 
-                      width: "10%"
+                      width: "10%" , position:"relative"
                   }}}> 
-                   <button
-                      className="set-center"
-                      style={{
-                        flexDirection:"row",
-                        border: "none",
-                        background: "none",
-                        color: "#848387",
-                        cursor: "pointer",
-                        padding:"3px",
-                        fontSize:".8em"
-                      }}  
-                  >
-                    <img src="../icons/ionicons/eye-outline.svg" style={{width:".8rem",marginRight:".5rem"}} /> 
-                      <label>
-                        <small>ดู & แก้ไข</small>
-                    </label>
-                  </button>
-                    
+                   <div className="set-center" style={{left:0,top:0, width:"90%",height:"100%",zIndex:5,position:"absolute"}} >    
+                       
+                      <button
+                          className="set-center"
+                          style={{
+                            flexDirection:"row",
+                            border: "none",
+                            background: "none",
+                            color: "#848387",
+                            cursor: "pointer",
+                            padding:"3px",
+                            fontSize:".8em"
+                          }}  
+                      >
+                        <img src="../icons/ionicons/eye-outline.svg" style={{width:".8rem",marginRight:".5rem"}} /> 
+                          <label>
+                            <small>ดู & แก้ไข</small>
+                        </label>
+                      </button>
+                    </div>
+                  
+                   {index == 0 &&   <div style={{width:"100%",height:( filteredMembers.length+1)+"00%",  position:"absolute",top:"0",zIndex: 0,left:0,
+                      boxShadow:"-18px -5px 15px -22px rgba(0,0,0,0.1)",background:"#FFF" ,  }} > </div> }
                   </th>
                 </tr>
               ))}
@@ -201,11 +204,13 @@ const thStyle: React.CSSProperties = {
   textAlign: "left",
   padding: "0.75rem",
   fontSize: "0.8rem", 
+  background:"white"
 };
 
 const tdStyle: React.CSSProperties = {
   padding: "0.75rem", 
   color: "#333",
   textAlign:"left",
-  fontSize:".9em"
+  fontSize:".9em",
+  borderBottom:"none"
 };

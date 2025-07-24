@@ -85,6 +85,10 @@ const Sidebar: React.FC = () => {
 
   useEffect(() => {
     fetchSidebarData().then(async (data) => {
+      const token = await getCookie("auth_token")
+      if(!token){
+        handleLogout()
+      } 
       const user = await getMemberdetail() //getCookie("user_info")
       console.log("user ",user)
       setUser(user)
@@ -100,6 +104,11 @@ const Sidebar: React.FC = () => {
     }
     getMoo()
   }, [window.location.pathname]);
+
+   const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login"; // redirect ไปหน้า login
+  };
 
   return (
     <aside className="sidebar">

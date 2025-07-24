@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent } from 'react';
 import "./css/ActivityForm.css"
 import { createActivity, getActivities } from '../action';
+import { useAlert } from '../components/AlertContext';
 
 type ImageData = {
   file: File;
@@ -19,6 +20,9 @@ export default function ActivityForm() {
   const [end , setEnd] = useState("")
   const [place , setPlace] = useState("")
   const [termsCondition , setTermsCondition] = useState("")
+  const [showAlert] = useAlert();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  
 
 //   const [imgs, setImages] = useState([]/)
 
@@ -76,16 +80,23 @@ useEffect(()=>{
    for (const [key, value] of formData.entries()) {
     console.log(key , " = ", value);
     } 
-    const newactivitycreated = await createActivity(formData);
-    console.log("newactivitycreated ",newactivitycreated)
+    const result = await createActivity(formData);
+    console.log("result ",result)
+   if(result?.result){ 
+       showAlert('เพิ่มกิจกรรมสำเร็จ', 'success') 
+     }else{
+      showAlert('เพิ่มกิจกรรมไม่สำเร็จ',"error")
+     }
   }
 
   return ( 
-    <div style={{ background: "#f5f5f5", minHeight: "100vh", padding: "2rem" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto",paddingTop:"2.5rem",textAlign:"left" }}>
-        <label style={{margin:".5rem 0 1rem .5rem"}} > งานกิจกรรม</label>
-        <div className="activity-form">
-        {/* <h2 className="form-title">แบบฟอร์มบันทึกกิจกรรม</h2> */}
+    <div className='page' style={{overflowY:"scroll"}} >
+      <div style={{ maxWidth: "1200px", margin: "0 auto",paddingTop:"2.5rem",textAlign:"left"}}>
+        <div  className="activity-form" style={{background:"none",padding:"none"}}>
+           <label   > งานกิจกรรม</label>
+        </div>
+       
+        <div className="activity-form"> 
 
         <div className="form-group">
             <label>ชื่อกิจกรรม</label>
@@ -137,9 +148,16 @@ useEffect(()=>{
             }}
             onDragLeave={() => setDragActive(false)}
             onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
             >
-            <p>ลาก & วางไฟล์ที่นี่ หรือ</p>
-            <input type="file" multiple onChange={handleFileChange} />
+            <p>ลาก & วางไฟล์ที่นี่ หรือคลิกเพื่อเลือกไฟล์</p>
+              <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
             </div>
 
             <div className="image-preview">

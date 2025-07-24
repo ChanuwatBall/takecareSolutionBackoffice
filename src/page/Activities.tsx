@@ -3,10 +3,13 @@ import { getActivities, updateActivityStatus } from "../action";
 import "./css/Activities.css"
 import Alert from "../components/Alert";
 import { useAlert } from "../components/AlertContext";
+const apiUrl = import.meta.env.VITE_API;
 
 const Activities=()=>{
    const [activities , setActivities] = useState<any[]>([])
    const [showAlert] = useAlert();
+
+  const [selected, setSelected] = useState<any | null>(null);
 
       const activity =async()=>{
         const res = await getActivities()
@@ -35,7 +38,7 @@ const Activities=()=>{
 
 
     return(
-     <div style={{ background: "#f5f5f5", minHeight: "100vh", padding: "2rem" }}>
+     <div style={{  minHeight: "100vh", padding: "2rem" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto",paddingTop:"2.5rem",textAlign:"left" }}>
          
       <div className="activity-page">
@@ -56,7 +59,10 @@ const Activities=()=>{
               return (
                 <tr key={item.id}>
                   <td>{String(index + 1).padStart(3, '0')}</td>
-                  <td>{item.name}</td>
+                  <td> <button className="link-btn" onClick={() => setSelected(item)}> 
+                    {item.name}
+                    </button>
+                  </td>
                   <td>
                     {current && (
                       <StatusTag
@@ -74,6 +80,37 @@ const Activities=()=>{
       </div>
     </div>
         </div>
+
+
+      {selected && (
+        <div className="modal">
+          <div className="modal-content" style={{width:"80vw"}}>
+            <h3>{selected.name}</h3>
+            <img src={apiUrl+"/api/file/drive-image/"+selected.coverImagePath} alt="cover" style={{ width: '100%', maxHeight: 200, objectFit: 'cover', marginBottom: 10 }} />
+            <p><strong>ชื่อย่อ:</strong> {selected.shortName}</p>
+            <p><strong>รายละเอียด:</strong> {selected.description}</p>
+            <p><strong>วันที่จัด:</strong> {selected.startDate} - {selected.endDate}</p>
+            <p className="set-center" style={{ flexDirection:"row"}} ><strong>สถานะ:</strong> 
+               {/* {selected.draft ? 'แบบร่าง' : 'เผยแพร่'} | {selected.enable ? 'ใช้งาน' : 'ปิดใช้งาน'} */} 
+               &nbsp;
+                <StatusTag
+                        draft={selected.draft}
+                        enable={selected.enable}
+                        onUpdate={(draft, enable) => updateStatus(selected.id, draft, enable)}
+                />
+            </p>
+            <div className="image-gallery">
+              {selected.imagePaths.map((id: string, i: number) => (
+                <img key={i} src={`${apiUrl}/api/file/drive-image/${id}`} alt={`img-${i}`} style={{ width: 100, height: 80, objectFit: 'cover', margin: 4 }} />
+              ))}
+            </div>
+            <div style={{ textAlign: 'right', marginTop: 16 }}>
+              <button onClick={() => setSelected(null)} className="btn">ปิด</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       </div>
     )
 }
