@@ -2,16 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { decodeBase64, getVillagersByVillage } from "../action";
 
-
-  interface Member {
-    id: string;
-    username: string;
-    phone: string;
-    fullName: string;
-    birthdate: string; // ISO date string
-    email?: string;
-    gender?: string;
-  }
+ 
   interface Villager {
       id: number
       lineName: string

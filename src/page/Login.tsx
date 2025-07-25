@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react"; 
 import "./css/Login.css"; // ใช้สำหรับใส่ CSS ปุ่ม
 import Alert from "../components/Alert";
 import { getCookie, getDefaultCompay, login, setCookie } from "../action";
-import Cookies from 'js-cookie';
+ 
 
 const Login=()=>{
     const [isOpen, setIsOpen] = useState(false);
-    const navigate = useNavigate();
+  
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [passtype , setPassType] = useState("password") 

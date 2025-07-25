@@ -2,7 +2,7 @@
 // src/components/Sidebar.tsx
 import React, { useEffect, useState } from "react";
 import "./css/Sidebar.css";
-import { useNavigate, useNavigation, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { deleteCookie, encodeBase64, getCookie, getMemberdetail, getSubdistrict } from "../action";
 import AccordionMenu from "./AccordionMenu";
 
@@ -40,16 +40,9 @@ const fetchSidebarData = async () => {
 };
 
 const Sidebar: React.FC = () => {
-  const [menuData, setMenuData] = useState<any[]>([]);
+  const [menuData ] = useState<any[]>([]);
   const [tumbonMooMember,setTumbonMooMember] = useState([])
-  const [currentUser ,setUser] = useState( {
-    role: "admin", // หรือ "admin"
-    allowedTopicIds: [
-      "dashboard", 
-      "trash", 
-      "road" ,
-      "water","heat","animals","maintenance", "trees", "clean"], // เฉพาะเรื่องร้องทุกข์
-  })
+ 
   const [complaintMenu ,setComplaintMenu] = useState([
         { id: "road", label: "ถนน", roles: ["admin", "user"]  ,path:"/complaint/road"},
         { id: "water", label: "ประปา", roles: ["admin", "user"]  ,path:"/complaint/water"},
@@ -63,14 +56,13 @@ const Sidebar: React.FC = () => {
   const nav = useNavigate() 
 
   useEffect(() => {
-    fetchSidebarData().then(async (data) => {
+    fetchSidebarData().then(async () => {
       const token = await getCookie("auth_token")
       if(!token){
         handleLogout()
       } 
       const user = await getMemberdetail() //getCookie("user_info")
-      console.log("user ",user)
-      setUser(user)
+      
       
       const filtered = complaintMenu.filter((menu)=> user?.allowedTopicIds.includes(menu?.id))
       console.log("filtered ",filtered)
@@ -174,52 +166,4 @@ const Sidebar: React.FC = () => {
 };
 export default Sidebar;
 
-
-// Mock API response
-const sidebarData = [
-    {
-      id: "group1",
-      title: "ภาพรวม",
-      gradient: true,
-      roles: ["admin", "user"],
-      children: [
-        { id: "dashboard", label: "แดชบอร์ด", roles: ["admin", "user"] ,path:"/dashboard"},
-      ],
-    },
-    {
-      id: "group2",
-      title: "รายชื่อสมาชิก",
-      gradient: true,
-      roles: ["admin", "user"],
-      children: [
-        { id: "moo1", label: "หมู่ 1", roles: ["admin", "user"]  ,path:"/moo/moo1"},
-        { id: "moo2", label: "หมู่ 2", roles: ["admin", "user"]  ,path:"/moo/moo2"},
-      ],
-    },
-    {
-      id: "group3",
-      title: "เรื่องร้องทุกข์",
-      gradient: true,
-      roles: ["admin", "user"],
-      children: [
-        { id: "road", label: "ถนน", roles: ["admin", "user"]  ,path:"/complaint/road"},
-        { id: "water", label: "ประปา", roles: ["admin", "user"]  ,path:"/complaint/water"},
-        { id: "trash", label: "ขยะ", roles: ["admin", "user", "user"]  ,path:"/complaint/trash"},
-        { id: "heat", label: "เหตุเดือดร้อน / รำคาญ", roles: ["admin", "user"]  ,path:"/complaint/heat"}, 
-        { id: "animals", label: "สัตว์จรจัด", roles: ["admin", "user"]  ,path:"/complaint/animals" },
-        { id: "maintenance", label: "ซ่อมแซม", roles: ["admin", "user"]  ,path:"/complaint/maintenance"}, 
-        { id: "trees", label: "ตัดต้นไม้", roles: ["admin", "user"]  ,path:"/complaint/trees"},
-        { id: "clean", label: "ทำความสะอสด", roles: ["admin", "user"]  ,path:"/complaint/clean"},
-      ],
-    }, 
-    {
-      id: "group4",
-      title: "งานกิจกรรม",
-      gradient: true,
-      roles: ["admin", "user"],
-      children: [
-        { id: "addevent", label: "เพิ่มกิจกรรม", roles: ["admin", "user"]  ,path:"/addevent"},
-        { id: "allevents", label: "กิจกรรมทั้งหมด", roles: ["admin", "user"]  ,path:"/allevents"}, 
-      ],
-    },
-  ]
+ 

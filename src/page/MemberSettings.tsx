@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import './css/MemberSettingsPage.css';
 import { addMember, deleteMember, getMembers } from '../action';
 import { useAlert } from '../components/AlertContext';
@@ -49,7 +49,7 @@ const MemberSettings = () => {
   const [filter,setFilter] = useState(false)
 
   const [member,setMember] = useState<Member | null>(null)
-  const [topicChoise , setTopicChoise] = useState(complaintTitile)
+  const [topicChoise  ] = useState(complaintTitile)
   const [isOpen ,setIsOpen ] = useState(false)
   const [message ,setMessage ] = useState("")
  
@@ -60,7 +60,7 @@ const MemberSettings = () => {
   const [password , setPassword] = useState("")
   const [role , setRole] = useState("")
   const [topic  , setTopic] = useState<any[]>([])
-  const [topicStr , setTopicStr] = useState("")
+  
   const [showAlert] = useAlert();
 
    

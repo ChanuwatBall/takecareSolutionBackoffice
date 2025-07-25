@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { getActivities, updateActivityStatus } from "../action";
-import "./css/Activities.css"
-import Alert from "../components/Alert";
+import "./css/Activities.css" 
 import { useAlert } from "../components/AlertContext";
 const apiUrl = import.meta.env.VITE_API;
 

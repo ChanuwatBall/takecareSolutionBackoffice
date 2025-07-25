@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent } from 'react';
 import "./css/ActivityForm.css"
-import { createActivity, getActivities } from '../action';
+import { createActivity  } from '../action';
 import { useAlert } from '../components/AlertContext';
 
 type ImageData = {
@@ -62,7 +62,7 @@ useEffect(()=>{
   const savePublish=async()=>{ 
     const formData = new FormData();
     
-    await  images.forEach((img, i) => {
+    await  images.forEach((img ) => {
         formData.append('images', img.file);
         if (img.isCover) {  
             formData.append(`coverImage`,  img.file );
@@ -185,7 +185,7 @@ useEffect(()=>{
 
         <div className="form-actions">
             <button type="submit" className="btn btn-primary"
-              onClick={(e)=>{savePublish()}}
+              onClick={()=>{savePublish()}}
             >บันทึก</button>
             <button type="button" className="btn btn-outline">บันทึกแบบร่าง</button>
         </div>

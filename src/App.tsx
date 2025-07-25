@@ -1,7 +1,6 @@
 
 
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
-import Home from './page/Home'
+import {  Routes, Route,  Navigate } from "react-router-dom"; 
 import { useState, type JSX } from 'react'
 import Dashboard from './page/Dashboard'
 import Login from './page/Login'

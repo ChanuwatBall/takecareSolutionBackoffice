@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState } from "react"; 
 
 interface Member {
   id: string;
@@ -12,10 +11,9 @@ interface Member {
 }
 
 
-const Member=()=>{
-    const { id } = useParams<{ id: any }>();
-    const [members, setMembers] = useState<Member[]>([])
-    const [search, setSearch] = useState("");
+const Member=()=>{ 
+    const [members ] = useState<Member[]>([])
+    const [search ] = useState("");
 
      const filteredMembers = members.filter((m:any) =>
         `${m.firstName} ${m.lastName} ${m.phoneNumber}`.toLowerCase().includes(search.toLowerCase())

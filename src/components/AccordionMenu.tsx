@@ -32,6 +32,7 @@ const AccordionMenu: React.FC<Props> = ({ data ,select }) => {
   };
 
   useEffect(()=>{ 
+    console.log("openVillageId ",openVillageId)
     // setTimeout(()=>{ 
     //     if(data.length > 0 ){  
     //       setOpenId(id =>( id = data[0].id))

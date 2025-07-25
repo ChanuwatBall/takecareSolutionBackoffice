@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import "./css/Settings.css"
 import { getCookie } from '../action';
 
