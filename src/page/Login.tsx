@@ -60,6 +60,11 @@ const Login=()=>{
             if(token){ 
                 window.location.href = "/"
             }
+            const login =  await getCookie("login");
+            if(login){
+                setUsername(login?.username)
+                setPassword(login?.password)
+            }
         }
         checkLogin()
     },[])

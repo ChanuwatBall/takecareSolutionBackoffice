@@ -1,7 +1,7 @@
 // src/components/Navbar.tsx
 import React, { useEffect, useRef, useState } from "react";
 import "./css/Navbar.css";
-import { getCookie } from "../action";
+import { deleteCookie, getCookie } from "../action";
 const apiUrl = import.meta.env.VITE_API;
 
 interface NavbarProps {
@@ -27,7 +27,9 @@ const Navbar: React.FC<NavbarProps> = ({ onToggle }) => {
   const [profile , setProfile ] = useState<User|any>(null)
 
 
-  const handleLogout = () => {
+  const handleLogout = async() => {
+    await deleteCookie("auth_token");
+    await deleteCookie('user_info');
     localStorage.removeItem("token");
     window.location.href = "/login"; // redirect ไปหน้า login
   };

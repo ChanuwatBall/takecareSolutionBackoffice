@@ -3,21 +3,10 @@
 import React, { useEffect, useState } from "react";
 import "./css/Sidebar.css";
 import { useNavigate, useNavigation, useParams } from "react-router-dom";
-import { encodeBase64, getCookie, getMemberdetail, getSubdistrict } from "../action";
+import { deleteCookie, encodeBase64, getCookie, getMemberdetail, getSubdistrict } from "../action";
 import AccordionMenu from "./AccordionMenu";
 
-
-// mock user info
-// const currentUser = {
-//   role: "admin", // หรือ "admin"
-//   allowedTopicIds: [
-//     "dashboard", 
-//     "trash", 
-//     "road" ,
-//     "water","heat","animals","maintenance", "trees", "clean"], // เฉพาะเรื่องร้องทุกข์
-// };
-
-// mock fetch
+  
 const fetchSidebarData = async () => {
   // สมมุติว่าเรียกจาก API จริง
   return Promise.resolve([ 
@@ -46,17 +35,7 @@ const fetchSidebarData = async () => {
         { id: "trees", label: "ตัดต้นไม้", roles: ["admin", "user"]  ,path:"/complaint/trees"},
         { id: "clean", label: "ทำความสะอสด", roles: ["admin", "user"]  ,path:"/complaint/clean"},
       ],
-    }, 
-    // {
-    //   id: "group4",
-    //   title: "งานกิจกรรม",
-    //   gradient: true,
-    //   roles: ["admin", "user"],
-    //   children: [
-    //     { id: "addevent", label: "เพิ่มกิจกรรม", roles: ["admin", "user"]  ,path:"/addevent"},
-    //     { id: "allevents", label: "กิจกรรมทั้งหมด", roles: ["admin", "user"]  ,path:"/allevents"}, 
-    //   ],
-    // },
+    },  
   ]);
 };
 
@@ -105,7 +84,9 @@ const Sidebar: React.FC = () => {
     getMoo()
   }, [window.location.pathname]);
 
-   const handleLogout = () => {
+   const handleLogout = async() => {
+     await deleteCookie("auth_token");
+     await deleteCookie('user_info'); 
     localStorage.removeItem("token");
     window.location.href = "/login"; // redirect ไปหน้า login
   };

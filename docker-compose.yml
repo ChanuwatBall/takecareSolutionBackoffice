@@ -1,0 +1,10 @@
+services:
+  vite-react-app:
+    image: takecare-solution-backoffice:latest       # ชื่อ image ที่จะ build
+    build:
+      context: .                           # โฟลเดอร์โปรเจกต์ปัจจุบัน
+      dockerfile: Dockerfile               # ชื่อ Dockerfile (ไม่ใส่ก็ได้ถ้าใช้ชื่อมาตรฐาน)
+    ports:
+      - "5173:80"                          # host:container
+    env_file:
+      - .env.production                    # ให้โหลดไฟล์ env ตอน build (Vite ใช้ตอน build เท่านั้น)

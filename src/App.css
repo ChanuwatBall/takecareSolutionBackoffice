@@ -100,3 +100,6 @@ button.clear{
   }
 }
 
+thead , th{
+  background: none !important;
+}
