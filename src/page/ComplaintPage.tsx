@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { complaintslist } from "../action";
 
 interface ComplaintItem {
   id: string;
@@ -11,18 +12,29 @@ interface ComplaintItem {
 
 const ComplaintPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [complaints, setComplaints] = useState<ComplaintItem[]>([
+  const [complaints, setComplaints] = useState<any[]>([
   {
-    "id": "001",
+    "id": 1,
     "phone": "0987654321",
-    "topic": "ถนนชำรุด / เป็นหลุมเป็นบ่อ",
+    "supTitle": "ถนนชำรุด / เป็นหลุมเป็นบ่อ",
+    "topic": {  //table complaint_topic
+      id: 2		 , 
+      topicId:"road" ,
+      topicName: "ถนน"
+    },
     "detail": "พื้นถนน แตก ร้าว",
     "status": "pending"
   },
   {
-    "id": "002",
+    "id": 2 ,
     "phone": "0987654333",
-    "topic": "ไม่มีทางเท้า / ทางเท้าชำรุด",
+    "supTitle": "ไม่มีทางเท้า / ทางเท้าชำรุด",
+    "topic": {  //table complaint_topic
+      id: 2		 , 
+      topicId:"road" ,
+      topicName: "ถนน"
+    },
+    "topicid": "road",
     "detail": "ทางเท้าพัง มีเศษวัสดุ อิฐหลุด",
     "status": "done"
   }
@@ -34,11 +46,14 @@ const ComplaintPage: React.FC = () => {
   const startIdx = (page - 1) * PER_PAGE;
   const paginated = complaints.slice(startIdx, startIdx + PER_PAGE);
 
-  useEffect(() => {
-    // Mock API fetch by complaint ID
-    fetch(`/api/complaint/${id}/items`)
-      .then((res) => res.json())
-      .then(setComplaints);
+  useEffect(() => { 
+    console.log("complaints id ", id)
+    const getComplaints=async()=>{
+      const complaints =  await complaintslist(id)
+      console.log("complaints ", complaints)
+      setComplaints(complaints)
+    }
+   getComplaints()
   }, [id]);
 
   return (
@@ -94,7 +109,7 @@ const ComplaintPage: React.FC = () => {
                       boxShadow:"7px 2px 14px -8px rgba(0,0,0,0.1)",background:"#FFF" ,  }} ></div>}
                   </td>
                   <td style={{...td, ...{paddingLeft:"1.5rem"}}}>{item.phone}</td>
-                  <td style={td}>{item.topic}</td>
+                  <td style={td}>{item?.topic?.topicName}</td>
                   <td style={td}>{item.detail}</td>
                   <td style={td} className="set-center">
                     <button style={viewBtnStyle}>ดูรูปภาพ</button>

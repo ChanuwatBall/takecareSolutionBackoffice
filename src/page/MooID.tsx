@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { decodeBase64, getVillagersByVillage } from "../action";
+import './css/Villager.css';
+import { useAlert } from "../components/AlertContext";
 
  
   interface Villager {
@@ -32,19 +34,58 @@ import { decodeBase64, getVillagersByVillage } from "../action";
     const { id } = useParams<{ id: any }>();
     const [members, setMembers] = useState<Villager[]>([ ]);
     const [search, setSearch] = useState("");
-    const [village,setVillage] = useState<Village | any>(null);
-  
+    const [village,setVillage] = useState<  any>(null);
+    const [dialogOpen,setDialogOpen] = useState(false)
+    const [villager,setVillager] = useState<Villager|null>(null)
+    const [showAlert] = useAlert();
 
-  useEffect(() => { 
-    const villageid = decodeBase64(id)
+    const [villid ,setVillId] = useState(0) 
+    const [firstName , setFistName] = useState("")
+    const [email,setEmail] = useState("")
+    const [lastName , setLastName] = useState("")
+    const [phone , serPhone] = useState("")
+    const [villageName , setVillageName] = useState("")
+    const [subdistrict , setSubdistrictName] = useState("")
+    const [birthDate , setBirthdate] = useState("")
+    const [ adress , setAddress] = useState("")
+    const [gender ,setGender] = useState("")
+    
     const getVillager=async()=>{
+      const villageid = decodeBase64(id)
       const villager = await getVillagersByVillage({id:villageid})
       console.log("villager ",villager)
       setMembers(villager?.villager)
       setVillage(villager?.village)
     }
-    getVillager()
-  }, [id ]);
+
+    const assigntoform=(data:any)=>{
+      setVillId(data?.id)
+      setFistName(data?.firstName)
+      setEmail(data?.email)
+      setLastName(data?.lastName)
+      serPhone(data?.phoneNumber)
+      setVillageName(data?.villageName)
+      setBirthdate(data?.birthDate)
+      setAddress(data?.address)
+      setGender(data?.gender)
+      setSubdistrictName(data?.subdistrictName)
+    }
+    useEffect(() => { 
+      getVillager()
+    }, [id ]);
+
+  const updateVillager=async(data:any)=>{
+
+    console.log("update ",data)
+    const result:any = await updateVillager(data)
+    if(result?.result){ 
+       showAlert(`อัปเดตสมาชิก ${data?.firstName} ${data?.lineName} สำเร็จ`, 'success') 
+        getVillager()
+     }else{
+      showAlert( `อัปเดตสมาชิก ${data?.firstName} ${data?.lineName} ไม่สำเร็จ`,"error")
+     }
+
+  }
 
   const filteredMembers = members.filter((m) =>
     `${m.firstName} ${m.lastName} ${m.phoneNumber}`.toLowerCase().includes(search.toLowerCase())
@@ -157,6 +198,12 @@ import { decodeBase64, getVillagersByVillage } from "../action";
                    <div className="set-center" style={{left:0,top:0, width:"90%",height:"100%",zIndex:5,position:"absolute"}} >    
                        
                       <button
+                          onClick={()=>{
+                            setVillager((prev:any) => prev=v);
+                            console.log("select village  ", v);
+                            setDialogOpen(true)
+                            assigntoform(v)
+                          }}
                           className="set-center"
                           style={{
                             flexDirection:"row",
@@ -182,9 +229,75 @@ import { decodeBase64, getVillagersByVillage } from "../action";
               ))}
             </tbody>
           </table>
+        
+           {/* <EditMemberDialog 
+            open={dialogOpen}
+            data={villager}
+            onClose={() => setDialogOpen(false)}
+            onSave={(data:any)=>{ updateVillager(data)}}
+          /> */}
+         {dialogOpen &&  <div className="modal" style={{zIndex:999, top:0 ,}}>
+          <div className="modal-content" style={{width:"80vw",minHeight:"20rem", maxHeight:"90vh", overflowY:"scroll"}}>
+            <label  className="text-left">ดู / แก้ไขสมาชิก</label><br/>
+            <form style={{width:"100%", display:"flex",flexDirection:"row"}} >
+              <div style={{width:"50%"}} > 
+                <label className="text-left">ชื่อ
+                  <input className="input" name="firstName" value={firstName} onChange={(e)=>{setFistName(e?.target.value)}} />
+                </label>
+                <label className="text-left" > นามสกุล
+                  <input className="input" name="lastName" value={lastName} onChange={(e)=>{setLastName(e?.target.value)}}  />
+                </label>
+                <label className="text-left" > เบอร์โทร
+                  <input className="input" name="phoneNumber"  value={phone}  onChange={(e)=>{serPhone(e?.target.value)}} />
+                </label>
+                <label className="text-left" > วันเกิด
+                  <input className="input" type="date" name="birthDate"  value={birthDate}  onChange={(e)=>{setBirthdate(e?.target.value)}}  />
+                </label>
+                <label className="text-left" > ที่อยู่
+                  <input className="input" name="address" value={adress}  onChange={(e)=>{setAddress(e?.target.value)}}  />
+                </label>
+                <label className="text-left" > เพศ <br/>
+                  <select  className="input" name="gender"  value={gender}  onChange={(e)=>{setGender(e?.target.value)}}  >
+                    <option value="MALE">ชาย</option>
+                    <option value="FEMALE">หญิง</option>
+                  </select>
+                </label>
+              </div>
+              <div style={{width:"50%", }} > 
+                <label className="text-left" > อีเมล
+                  <input className="input" name="email"  value={email}  onChange={(e)=>{setEmail(e?.target.value)}}  />
+                </label>
+                <label className="text-left" > หมู่บ้าน
+                  <input className="input"  disabled  value={village}  onChange={(e)=>{setVillage(e?.target.value)}}  />
+                </label>
+                <label className="text-left" > ตำบล
+                  <input className="input"   disabled  value={subdistrict}  onChange={(e)=>{setSubdistrictName(e?.target.value)}}  />
+                </label> 
+              </div>
+            </form>
+            <div style={{width:"100%"}}>
+              <button type="submit" onClick={()=>{updateVillager( { 
+                id: villid ,
+                firstName ,
+                email,
+                lastName , 
+                phoneNumber: phone , 
+                villageName: village ,  
+                subdistrictName: subdistrict ,  
+                birthDate , 
+                adress ,  
+                gender , 
+              }) }} >บันทึก</button> &nbsp;
+              <button type="button" onClick={() =>{setDialogOpen(false) }}>
+                ยกเลิก
+              </button>
+            </div>
+        </div> 
+      </div> }
+          
         </div>
       </div>
-    </div>
+    </div> 
     </div>
     )
 }
@@ -205,3 +318,128 @@ const tdStyle: React.CSSProperties = {
   fontSize:".9em",
   borderBottom:"none"
 };
+
+
+ 
+
+interface Member {
+  id: number;
+  lineName: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  birthDate: string;
+  address: string;
+  gender: string;
+  agreePolicy: boolean;
+  email: string | null;
+  villageId: number;
+  villageName: string;
+  subdistrictId: number;
+  subdistrictName: string;
+  companyId: number;
+  companyName: string;
+  createdAt: string | null;
+}
+ 
+
+const EditMemberDialog = ({ open, onClose, data, onSave }:any) => {
+  const [id ,setId] = useState(0) 
+  const [formData, setFormData] = useState<any>(data);
+  const [firstName , setFistName] = useState("")
+  const [email,setEmail] = useState("")
+  const [lastName , setLastName] = useState("")
+  const [phone , serPhone] = useState("")
+  const [village , setVillage] = useState("")
+  const [subdistrict , setSubdistrictName] = useState("")
+  const [birthDate , setBirthdate] = useState("")
+  const [ adress , setAddress] = useState("")
+  const [gender ,serGender] = useState("")
+
+  const handleSave = () => {
+    const data ={ 
+      id ,
+      firstName ,
+      email,
+      lastName , 
+      phoneNumber: phone , 
+      villageName: village ,  
+      subdistrictName: subdistrict ,  
+      birthDate , 
+      adress ,  
+      gender , 
+    }
+    console.log("data ",data )
+    onSave(data);
+    onClose();
+  };
+
+  useEffect(()=>{ 
+    if(open){
+      console.log("data ",data)
+      setId(data?.id)
+      setFistName(data?.firstName)
+      setEmail(data?.email)
+      setLastName(data?.lastName)
+      serPhone(data?.phoneNumber)
+      setVillage(data?.villageName)
+      setBirthdate(data?.birthDate)
+      setAddress(data?.address)
+      serGender(data?.gender)
+      setSubdistrictName(data?.subdistrictName)
+    }
+  },[])
+
+  if (!open) return null;
+
+  return (
+    open && <div className="modal" style={{zIndex:999, top:0 ,}}>
+       <div className="modal-content" style={{width:"80vw",minHeight:"20rem", maxHeight:"90vh", overflowY:"scroll"}}>
+        <label  className="text-left">ดู / แก้ไขสมาชิก</label><br/>
+        <form style={{width:"100%", display:"flex",flexDirection:"row"}} >
+          <div style={{width:"50%"}} > 
+            <label className="text-left">ชื่อ
+              <input className="input" name="firstName" value={firstName} onChange={(e)=>{setFistName(e?.target.value)}} />
+            </label>
+            <label className="text-left" > นามสกุล
+              <input className="input" name="lastName" value={lastName} onChange={(e)=>{setLastName(e?.target.value)}}  />
+            </label>
+            <label className="text-left" > เบอร์โทร
+              <input className="input" name="phoneNumber"  value={phone}  onChange={(e)=>{serPhone(e?.target.value)}} />
+            </label>
+            <label className="text-left" > วันเกิด
+              <input className="input" type="date" name="birthDate"  value={birthDate}  onChange={(e)=>{setBirthdate(e?.target.value)}}  />
+            </label>
+            <label className="text-left" > ที่อยู่
+              <input className="input" name="address" value={adress}  onChange={(e)=>{setAddress(e?.target.value)}}  />
+            </label>
+            <label className="text-left" > เพศ <br/>
+              <select  className="input" name="gender"  value={gender}  onChange={(e)=>{setFistName(e?.target.value)}}  >
+                <option value="MALE">ชาย</option>
+                <option value="FEMALE">หญิง</option>
+              </select>
+            </label>
+          </div>
+          <div style={{width:"50%", }} > 
+            <label className="text-left" > อีเมล
+              <input className="input" name="email"  value={email}  onChange={(e)=>{setEmail(e?.target.value)}}  />
+            </label>
+            <label className="text-left" > หมู่บ้าน
+              <input className="input"  disabled  value={village}  onChange={(e)=>{setVillage(e?.target.value)}}  />
+            </label>
+            <label className="text-left" > ตำบล
+              <input className="input"   disabled  value={subdistrict}  onChange={(e)=>{setSubdistrictName(e?.target.value)}}  />
+            </label> 
+          </div>
+        </form>
+        <div style={{width:"100%"}}>
+          <button type="submit" onClick={()=>{handleSave() }} >บันทึก</button> &nbsp;
+          <button type="button" onClick={() =>{onClose(false) }}>
+            ยกเลิก
+          </button>
+        </div>
+    </div> 
+  </div> 
+  );
+};
+ 

@@ -130,8 +130,7 @@ export async function deleteMember(body:any) {
   }
 } 
 
-
-
+ 
 export async function getVillagersByVillage({id}:any) {
     try {
     const token = await getCookie("auth_token")
@@ -146,6 +145,45 @@ export async function getVillagersByVillage({id}:any) {
   } catch (error: any) {
     console.error('POST failed:', error.message);
     return null
+  }
+}
+
+///complaints/list
+export async function complaintslist(topic:any) {
+ try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.post( "complaints/list" , {} , { 
+      params:{  
+        topic: topic
+      },
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return {result: false , description: error?.message}
+  }
+}
+
+///villager/update"
+export async function updateVillager(body:any) {
+ try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.post( "villager/update" , body , { 
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return {result: false , description: error?.message}
   }
 }
 
