@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getActivities, updateActivityStatus } from "../action";
 import "./css/Activities.css" 
 import { useAlert } from "../components/AlertContext";
+import { PrintExcelActivity } from "../components/PrintExcel";
 const apiUrl = import.meta.env.VITE_API;
 
 const Activities=()=>{
@@ -39,7 +40,11 @@ const Activities=()=>{
     return(
      <div style={{  minHeight: "100vh", padding: "2rem" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto",paddingTop:"2.5rem",textAlign:"left" }}>
-         
+          <div className="set-center" style={{flexDirection:"row" , justifyContent:"flex-end",marginBottom:"ๅrem"}} >
+           <PrintExcelActivity
+            jsonData={activities}               
+          />
+        </div>
       <div className="activity-page">
       <h2 className="page-title">งานกิจกรรม</h2>
 

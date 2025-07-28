@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { complaintslist, updateComplaintSts } from "../action";
 import "./css/Complaint.css"
 import { useAlert } from "../components/AlertContext";
+import { PrintExcel, PrintExcelComplaint } from "../components/PrintExcel";
 
 const apiUrl = import.meta.env.VITE_API;
 
@@ -56,7 +57,7 @@ const ComplaintPage: React.FC = () => {
     <div style={{ }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
         <div className="set-center" style={{flexDirection:"row" , justifyContent:"flex-end",marginBottom:"2rem"}} >
-            <button style={{
+            {/* <button style={{
                 width:"fit-content" ,
                 padding:".5rem",
                 background:"#FFF",
@@ -64,7 +65,12 @@ const ComplaintPage: React.FC = () => {
             }} > 
                 ส่งออกเป็นไฟล์  &nbsp;
                 <img src="../icons/ionicons/chevron-down-outline.svg" style={{width:".8rem"}} /> 
-            </button>
+            </button> */}
+            <PrintExcelComplaint 
+              jsonData={complaints} 
+              // sheetname={"เรื่องร้องเรียน"} 
+              // filename={"เรื่องร้องเรียน"}             
+            />
         </div>
         <h2 style={{ marginBottom: "1.5rem" ,textAlign:"left" }}>เรื่องร้องทุกข์</h2>
 

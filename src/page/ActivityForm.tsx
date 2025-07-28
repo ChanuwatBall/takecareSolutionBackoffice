@@ -3,6 +3,23 @@ import type { ChangeEvent, DragEvent } from 'react';
 import "./css/ActivityForm.css"
 import { createActivity  } from '../action';
 import { useAlert } from '../components/AlertContext';
+import Resizer from "react-image-file-resizer";
+
+const resizeFile = (file:any) =>
+  new Promise((resolve) => {
+    Resizer.imageFileResizer(
+      file,
+      500,
+      1200,
+      "JPG",
+      70,
+      0,
+      (File) => {
+        resolve(File);
+      },
+      "file"
+    );
+  });
 
 type ImageData = {
   file: File;
@@ -29,14 +46,30 @@ export default function ActivityForm() {
 useEffect(()=>{
 })
 
-  const handleFiles = (files: FileList | null) => {
+  const handleFiles = async (files: FileList | null) => {
     if (!files) return;
-    const newImages: ImageData[] = Array.from(files).map((file) => ({
-      file,
-      preview: URL.createObjectURL(file),
-      isCover: false,
-    }));
-    setImages((prev) => [...prev, ...newImages]);
+    console.log("file ", files) 
+   
+    const fileArray = Array.from(files);
+
+    const imageslist:any[] = await Promise.all(
+      fileArray.map(async (file) => {
+        const fileresize = await resizeFile(file);
+        return {
+          file: fileresize,
+          preview: URL.createObjectURL(file),
+          isCover: false,
+        };
+      })
+    );
+
+     console.log("imageslist ", imageslist)
+    // const newImages: ImageData[] = Array.from(files).map((file) => ({
+    //   file,
+    //   preview: URL.createObjectURL(file),
+    //   isCover: false,
+    // })); 
+    setImages((prev) => [...prev, ...imageslist]);
   };
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
@@ -60,9 +93,12 @@ useEffect(()=>{
   };
 
   const savePublish=async()=>{ 
+
+
     const formData = new FormData();
     
-    await  images.forEach((img ) => {
+    await  images.forEach(async (img ) => {  
+    
         formData.append('images', img.file);
         if (img.isCover) {  
             formData.append(`coverImage`,  img.file );
