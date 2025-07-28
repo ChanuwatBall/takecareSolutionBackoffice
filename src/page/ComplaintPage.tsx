@@ -1,63 +1,59 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { complaintslist } from "../action";
+import { complaintslist, updateComplaintSts } from "../action";
+import "./css/Complaint.css"
+import { useAlert } from "../components/AlertContext";
 
-interface ComplaintItem {
+const apiUrl = import.meta.env.VITE_API;
+
+export interface Complaint {
   id: string;
   phone: string;
-  topic: string;
+  supTitle: string;
   detail: string;
-  status: "pending" | "done";
+  status: 'pending' | "done" | 'in-progress' | string; // ปรับเพิ่มสถานะตามที่คุณใช้
+  villager: number;
+  topicId: number;
+  imageIds: string[];
 }
-
 const ComplaintPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [complaints, setComplaints] = useState<any[]>([
-  {
-    "id": 1,
-    "phone": "0987654321",
-    "supTitle": "ถนนชำรุด / เป็นหลุมเป็นบ่อ",
-    "topic": {  //table complaint_topic
-      id: 2		 , 
-      topicId:"road" ,
-      topicName: "ถนน"
-    },
-    "detail": "พื้นถนน แตก ร้าว",
-    "status": "pending"
-  },
-  {
-    "id": 2 ,
-    "phone": "0987654333",
-    "supTitle": "ไม่มีทางเท้า / ทางเท้าชำรุด",
-    "topic": {  //table complaint_topic
-      id: 2		 , 
-      topicId:"road" ,
-      topicName: "ถนน"
-    },
-    "topicid": "road",
-    "detail": "ทางเท้าพัง มีเศษวัสดุ อิฐหลุด",
-    "status": "done"
-  }
-]);
-  const [page, setPage] = useState(1);
+  const [complaints, setComplaints] = useState<any[]>([ ]); 
+  const [page, setPage] = useState(1); 
+  const [showAlert] = useAlert();
 
   const PER_PAGE = 20;
   const totalPages = Math.ceil(complaints.length / PER_PAGE);
   const startIdx = (page - 1) * PER_PAGE;
   const paginated = complaints.slice(startIdx, startIdx + PER_PAGE);
 
-  useEffect(() => { 
-    console.log("complaints id ", id)
     const getComplaints=async()=>{
       const complaints =  await complaintslist(id)
       console.log("complaints ", complaints)
       setComplaints(complaints)
     }
-   getComplaints()
+
+  useEffect(() => { 
+    console.log("complaints id ", id)
+    getComplaints()
   }, [id]);
 
+  const updateConplaintStatus=async(complaintId:any , newstatus:any)=>{
+    const form ={
+      id:complaintId ,
+      status:newstatus
+    }
+    const result = await updateComplaintSts(form)
+    if(result?.result){
+       getComplaints()
+       showAlert('อัปเดตสถานะ สำเร็จ', 'success')
+     }else{
+      showAlert('อัปเดสถานะ ไม่สำเร็จ',"error")
+     }
+    
+  }
   return (
-    <div style={{ background: "#f5f5f5", minHeight: "100vh", padding: "2rem" }}>
+    <div style={{ }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
         <div className="set-center" style={{flexDirection:"row" , justifyContent:"flex-end",marginBottom:"2rem"}} >
             <button style={{
@@ -109,39 +105,29 @@ const ComplaintPage: React.FC = () => {
                       boxShadow:"7px 2px 14px -8px rgba(0,0,0,0.1)",background:"#FFF" ,  }} ></div>}
                   </td>
                   <td style={{...td, ...{paddingLeft:"1.5rem"}}}>{item.phone}</td>
-                  <td style={td}>{item?.topic?.topicName}</td>
+                  <td style={td}>{item?.supTitle}</td>
                   <td style={td}>{item.detail}</td>
-                  <td style={td} className="set-center">
-                    <button style={viewBtnStyle}>ดูรูปภาพ</button>
+                  <td style={td} className="set-center" >
+                    <ButtonViewImages complaint={item} /> 
                   </td>
-                  <td style={td}  >
-                    <span
-                      className="set-center"
-                      style={{
-                        flexDirection:"row",
-                        justifyContent:"flex-start",
-                        padding: "0.25rem 0.75rem",
-                        minWidth:"5.8rem" ,
-                        width:"fit-content",
-                        borderRadius: "999px",
-                        background:
-                          item.status === "pending" ? "#F5EDD0" : "#C9F7DD",
-                        color: item.status === "pending" ? "#9E6300" : "#5FB088",
-                        fontWeight: 500,
-                        fontSize: "smaller",
-                      }}
-                    >
-                      {item.status === "pending" ? "กำลังดำเนินการ" : "เสร็จเรียบร้อย"} &nbsp;
-                      <img src="../icons/ionicons/chevron-expand-outline.svg" style={{width:".8rem"}} />
-                    </span>
+                  <td style={td}  > 
+                    <ComplaintStatus value={item.status} 
+                      update={(newsts)=>{
+                        console.log("update new status ", newsts) ; 
+                        updateConplaintStatus(item?.id, newsts)
+                      } }
+                    />
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          {complaints.length === 0 && <div className="set-center" style={{width:"100%", height:"15rem", }} >
+            <label> ไม่พบเรื่องร้องเรียน</label>  
+          </div>}
 
           {/* Pagination */}
-          <div
+           {complaints.length > 0 &&<div
             style={{
               marginTop: "2rem",
               display: "flex",
@@ -170,12 +156,68 @@ const ComplaintPage: React.FC = () => {
             >
               ▶
             </button>
-          </div>
+          </div>}
+
         </div>
       </div>
     </div>
   );
 };
+
+const ButtonViewImages=({complaint}:any)=>{
+  const [openModal , setOpenModal] = useState(false)
+  const [current , setCurrent] = useState(0)
+
+  useEffect(()=>{
+    // if(openModal){
+      console.log("complaint  ", complaint)
+    // }
+   },[])
+  return(
+    <>
+    <button style={viewBtnStyle} onClick={()=>{ 
+          setOpenModal(true) }    
+     }>ดูรูปภาพ</button>
+ 
+          {openModal &&  <div className="modal">
+            <div className="modal-content" style={{width:"70vw"}}>
+              <h3 style={{margin:"0px"}} >เรื่องร้องเรียน</h3>
+              <label>{complaint?.supTitle} </label> <br/>
+              <div className="contetnt  " style={{display:"flex" , flexDirection:"row"}} >
+                <div className="set-center" style={{width:"30%",height:"60vh",overflow:"scroll",paddingTop:"5rem"}}>
+                  {
+                    complaint?.imageIds.map((image:any, i:any)=> 
+                    <img  key={i} 
+                      src={apiUrl+`/api/file/drive-image/${image}`}  
+                      alt={`complaint-images-${i}`} 
+                      style={{height:"8rem",padding:".3rem"}}
+                      onClick={()=>{setCurrent(i)}}
+                      /> 
+                    )
+                  }
+                </div>
+                <div style={{width:"70%"}} className="set-center" >
+                  <img   
+                      src={apiUrl+`/api/file/drive-image/${complaint?.imageIds[current]}`}  
+                      alt={`complaint-images-${current}`} 
+                      style={{width:"auto" ,maxWidth:"100%", maxHeight:"50vh" }}
+                      /> 
+                </div>
+              
+
+              </div>
+              <div className="modal-actions " style={{margin:"0px"}}>
+                {/* <button type="submit" onClick={()=>{setOpenModal(false) }} >บันทึก</button> */}
+                <button type="button" onClick={() =>{ setOpenModal(false)  }}>
+                  ปิด
+                </button>
+            </div>
+            </div>
+          </div>}
+
+    </>
+  )
+}
 
 const th: React.CSSProperties = {
   padding: "0.75rem",
@@ -209,5 +251,55 @@ const navBtnStyle: React.CSSProperties = {
   height: "36px",
   cursor: "pointer",
 };
+
+
+ 
+
+export type ComplaintStatusType = 'pending' | 'in-progress' | 'done';
+
+interface ComplaintStatusProps {
+  value: ComplaintStatusType;
+  update: (newStatus: ComplaintStatusType) => void;
+}
+
+const STATUS_LABEL: Record<ComplaintStatusType, string> = {
+  pending: 'รอดำเนินการ',
+  'in-progress': 'กำลังดำเนินการ',
+  done: 'เสร็จเรียบร้อย',
+};
+
+export const ComplaintStatus: React.FC<ComplaintStatusProps> = ({ value, update }) => {
+  const [open, setOpen] = useState(false);
+
+  const toggleDropdown = () => setOpen(!open);
+
+  const handleSelect = (status: ComplaintStatusType) => {
+    update(status);
+    setOpen(false);
+  };
+
+  return (
+    <div className="complaint-status-wrapper">
+      <div className={`status-badge ${value}`} onClick={toggleDropdown}>
+        {STATUS_LABEL[value]} <span className="dropdown-icon">▾</span>
+      </div>
+      {open && (
+        <div className="status-dropdown">
+          {(Object.keys(STATUS_LABEL) as ComplaintStatusType[]).map((status) => (
+            <div
+              key={status}
+              className={`status-option ${status}`}
+              onClick={() => handleSelect(status)}
+            >
+              {STATUS_LABEL[status]}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+
 
 export default ComplaintPage;

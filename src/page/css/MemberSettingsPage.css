@@ -116,7 +116,7 @@ th, td {
   border-radius: 16px;
   padding: 20px;
   min-width: 250px;
-  max-width: 400px;
+  max-width: 50rem;
 }
 
 .modal-content h3 {

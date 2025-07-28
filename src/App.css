@@ -39,7 +39,9 @@ b , strong , h1 ,h2,h3,h4,h5,h6{
 .page{
   background-color: #F2F2F2;
   width: 100%;
-  min-height: 100vh;
+  height:  83vh;
+  overflow-y: scroll;
+  padding: 2rem;
 }
 
 button.clear{
@@ -102,4 +104,7 @@ button.clear{
 
 thead , th{
   background: none !important;
+}
+.no-marin{
+  margin: none !important;
 }

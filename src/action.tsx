@@ -169,6 +169,25 @@ export async function complaintslist(topic:any) {
   }
 }
 
+///complaint/updatestatus
+export async function updateComplaintSts(complaint:any) {
+ try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.post( "complaint/updatestatus" , complaint, {  
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return {result: false , description: error?.message}
+  }
+}
+
+
 ///villager/update"
 export async function updateVillager(body:any) {
  try {

@@ -29,10 +29,10 @@
   width: 220px;
   background: #fff; 
   border-right: 1px solid #eee;
-  height: 100vh;
-  overflow-y: auto;
+  height: 85vh; 
   padding: 1.7rem;
   font-size: small;
+  overflow-y: scroll;
 }
 
 .menu-group {

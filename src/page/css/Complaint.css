@@ -1,0 +1,80 @@
+
+.complaint-status-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.status-badge {
+  padding:  4px 16px;
+  border-radius: 20px;  
+  cursor: pointer;
+  display: flex;
+  text-align: center;
+  flex-direction: row ;
+  font-size: .8em;
+}
+
+/* .status-option.pending {
+  color: #f5bf40;
+}
+
+.status-option.in-progress {
+  color: #ecd229;
+}
+
+.status-option.done {
+  color: #08bf29;
+} */
+
+.status-badge.pending {
+  background-color: #f5bf40;
+  color: #fff;
+}
+
+.status-badge.in-progress {
+  background-color: #ecd229;
+  color: #a47000;
+}
+
+.status-badge.done {
+  background-color: #cbf7d3;
+  color: #08bf29;
+}
+
+.dropdown-icon {
+  margin-left: 8px;
+}
+
+.status-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.status-option {
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.status-option:hover {
+  background: #f0f0f0;
+}
+
+.status-option.pending {
+  color: #888888;
+}
+
+.status-option.in-progress {
+  color: #a47000;
+}
+
+.status-option.done {
+  color: #21804b;
+}
