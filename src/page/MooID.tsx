@@ -25,11 +25,7 @@ import { PrintExcel } from "../components/PrintExcel";
       createdAt: null
       email: string
   }
-
-  interface Village{
-    id: number
-    name:  string
-}
+ 
 
   const MooID:React.FC=()=>{
     const { id } = useParams<{ id: any }>();
@@ -235,27 +231,7 @@ const tdStyle: React.CSSProperties = {
 };
 
 
- 
-
-interface Member {
-  id: number;
-  lineName: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  birthDate: string;
-  address: string;
-  gender: string;
-  agreePolicy: boolean;
-  email: string | null;
-  villageId: number;
-  villageName: string;
-  subdistrictId: number;
-  subdistrictName: string;
-  companyId: number;
-  companyName: string;
-  createdAt: string | null;
-}
+  
  
 
 const ButtonEditMemberDialog = ({ villager , onSave }:any) => {

@@ -1,10 +1,9 @@
-import React, { useRef, useState } from 'react';
+import  { useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
 import type { ChangeEvent, DragEvent } from 'react';
 import "./css/UploadOfficerModal.css"
 import { exportMemberTemplate } from './PrintExcel';
-import { uploadMember } from '../action';
-import { useAlert } from './AlertContext';
+
 
 interface Officer {
   name: string;

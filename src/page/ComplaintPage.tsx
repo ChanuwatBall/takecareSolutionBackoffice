@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { complaintslist, updateComplaintSts } from "../action";
 import "./css/Complaint.css"
 import { useAlert } from "../components/AlertContext";
-import { PrintExcel, PrintExcelComplaint } from "../components/PrintExcel";
+import {  PrintExcelComplaint } from "../components/PrintExcel";
 
 const apiUrl = import.meta.env.VITE_API;
 
