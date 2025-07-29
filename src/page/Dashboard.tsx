@@ -14,6 +14,7 @@ import {  Pie } from 'react-chartjs-2';
 import ApexCharts from 'apexcharts';
 import moment from 'moment';
 import "./css/Dashboard.css"
+import { dashboardMemberStats } from '../action';
 
 moment.locale('th')
 
@@ -27,23 +28,59 @@ ChartJS.register(
   Legend
 );
  
+
+  const members = {
+    labels: ['2025-07-01', '2025-07-02', '2025-07-03', '2025-07-04', '2025-07-05', '2025-07-06', '2025-07-06', '2025-07-06', '2025-07-06'],
+    data:[
+    0,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    0,
+    3,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+]
+   
+  };
+
 const Dashboard = () => {
     const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
     const [linechart ,setLine] = useState<any>(null)
+    const [memberStats , setMemberState] = useState<any>({})
 
-  const memberStats = {
-    labels: ['2025-07-01', '2025-07-02', '2025-07-03', '2025-07-04', '2025-07-05', '2025-07-06', '2025-07-06', '2025-07-06', '2025-07-06'],
-    data: [3 , 5 ,7,12,9,4,15,3 , 5 ,7,12,9,4,15,3 , 5 ,7,12,9,4,15,3 , 5 ,7,12,9,4,15,7] ,
-    datasets: [
-      {
-        label: 'สมาชิกที่ทำการลงทะเบียน',
-        data: [10, 15, 30, 60, 300, 150],
-        borderColor: '#3f51b5',
-        borderWidth: 2,
-        fill: false,
-      },
-    ],
-  };
+
+  useEffect(()=>{
+    const membersRegiter=async ()=>{
+      const memberStats = await dashboardMemberStats(selectedMonth)
+      // console.log("result ",memberStats)
+      // setMemberState(memberStats)
+    }
+    membersRegiter()
+  },[])
 
   const complaintSummary = {
     total: 1130,
@@ -151,8 +188,8 @@ const Dashboard = () => {
         
           {/* </div>
           <div className="card"> */}
-          <div style={{width:"50%"}} className='set-center' > 
-            <Pie data={complaintChartData} style={{height:"17rem"}} options={{  plugins: {
+          <div style={{width:"50%", height:"15rem"}} className='set-center' > 
+            <Pie data={complaintChartData}  options={{  plugins: {
                 legend: {
                     display: false, 
                 }
