@@ -5,9 +5,16 @@
 
 .dashboard-header {
   display: flex;
-  justify-content: space-between;
+  justify-content:  flex-end;
   align-items: center;
   margin-bottom: 20px;
+  width: 100%;
+
+}
+.dashboard-header input{
+  border:  none;
+  padding: .5rem 1rem .5rem 1rem;
+  border-radius: 10px;
 }
 
 .card {

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,8 +10,12 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Line, Pie } from 'react-chartjs-2';
+import {  Pie } from 'react-chartjs-2';
+import ApexCharts from 'apexcharts';
+import moment from 'moment';
 import "./css/Dashboard.css"
+
+moment.locale('th')
 
 ChartJS.register(
   CategoryScale,
@@ -25,9 +29,11 @@ ChartJS.register(
  
 const Dashboard = () => {
     const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
+    const [linechart ,setLine] = useState<any>(null)
 
   const memberStats = {
-    labels: ['01', '02', '03', '04', '05', '06'],
+    labels: ['2025-07-01', '2025-07-02', '2025-07-03', '2025-07-04', '2025-07-05', '2025-07-06', '2025-07-06', '2025-07-06', '2025-07-06'],
+    data: [3 , 5 ,7,12,9,4,15,3 , 5 ,7,12,9,4,15,3 , 5 ,7,12,9,4,15,3 , 5 ,7,12,9,4,15,7] ,
     datasets: [
       {
         label: 'สมาชิกที่ทำการลงทะเบียน',
@@ -68,15 +74,16 @@ const Dashboard = () => {
       <div className="dashboard-header">
        
         <input
-          type="month"
+          type="month"  className='input'
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(e.target.value)}
         />
       </div>
 
-      <div className="card line-chart">
+      <div className="card line-chart" id='card-line-chart'>
         <h3>สมาชิกที่ทำการลงทะเบียน</h3>
-        <Line data={memberStats} />
+        <MemberRegisterLineChart wrapid="card-line-chart"  data={memberStats} setLine={(e:any) => setLine(e)} />
+        {/* <Line data={memberStats} /> */}
       </div>
 
       <div className="card-row">
@@ -149,3 +156,77 @@ const Dashboard = () => {
   ); 
 }
 export default Dashboard;
+
+
+const MemberRegisterLineChart=({wrapid , data , setLine}:any)=>{
+  var options:any = {
+    chart: {
+      type: 'line' , 
+    },
+    series: [{
+      name: 'sales',
+      data:  data?.data
+    }],
+    
+    // xaxis: {
+    //   categories: data?.labels, // [1991,1992,1993,1994,1995,1996,1997, 1998,1999]
+    // }
+    xaxis: { type: 'datetime', categories:  data?.labels,
+            labels: {  formatter: function (value:any) {  
+               return  moment(value).lang("th").format("DD MMM") 
+            } },
+        },
+    zoom: {
+      type: 'x' ,
+      enabled: true ,
+      autoScaleYaxis: false
+    },
+     grid: {
+          xaxis: {
+            lines: {
+              show: true,
+            },
+          },
+          yaxis: {
+            lines: {
+              show: true,
+            },
+          },
+        },
+  }
+
+  useEffect(()=>{
+    const createchart=()=>{
+      const el:any = document.getElementById(wrapid)
+      let labels: string | any[]  = []
+      console.log(el.offsetHeight)
+      const startOfMonth = moment().startOf('month').format();
+       Array.from(Array(30-labels.length)).map((label,index)=>{
+          labels = [...labels , moment(startOfMonth).add(index,'days').subtract(1,"month").format("YYYY-MM-DD")  ]
+       }
+      );
+      console.log("labels ",labels)
+
+      options = {...options , ...{
+        chart:{ type: 'line' ,  height:el.offsetHeight*2} , 
+        xaxis: {  show: true,  
+                tickPlacement: 'on', type: 'datetime', categories: labels,
+                labels: { format: 'dd MMM',  },
+            }}
+        }
+
+      const chartcontetnt:any = document.querySelector("#member-register-linechart")
+      // console.log("chartcontetnt ",chartcontetnt.innerHTML)
+      if( chartcontetnt?.innerHTML.length < 20){
+        var chart = new ApexCharts(chartcontetnt, options); 
+        chart.render();
+        setLine(chart)
+      }
+    }
+     createchart() 
+  },[])
+
+  return(
+    <div id='member-register-linechart'>  </div>
+  )
+}
