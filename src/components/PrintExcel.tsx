@@ -1,10 +1,9 @@
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import ExcelJS from 'exceljs'; 
+import ExcelJS, { Workbook } from 'exceljs'; 
 import { useState } from 'react';
 import "./css/PrintExcel.css" 
-import axios from 'axios';
-import fs from "fs"
+
 
 const apiUrl = import.meta.env.VITE_API;
  
@@ -217,12 +216,46 @@ export const PrintExcelComplaint= ({jsonData}:any ) => {
          onClick={exportToExcel}>  
              {loading ? "กำลังสร้างไฟล์"  :"ส่งออกเป็นไฟล์" }    &nbsp;
             <img src="../icons/ionicons/chevron-down-outline.svg" style={{width:".8rem"}} /> 
-    </button>
-
+     </button>
     </div>
   )
 };
  
+ 
+export const exportMemberTemplate = async () => {
+  const workbook = new Workbook();
+  const worksheet = workbook.addWorksheet('Template');
+
+  // Header
+  worksheet.columns = [
+    { header: 'name', key: 'name', width: 15 },
+    { header: 'username', key: 'username', width: 15 },
+    { header: 'password', key: 'password', width: 15 },
+    { header: 'email', key: 'email', width: 25 },
+    { header: 'phoneNumber', key: 'phoneNumber', width: 15 },
+    { header: 'allowedTopicIds', key: 'allowedTopicIds', width: 50 },
+    { header: 'companyId', key: 'companyId', width: 10 },
+    { header: 'role', key: 'role', width: 10 }, 
+  ];
+
+  // Example row
+  worksheet.addRow({
+    name: 'ชื่อจริง',
+    username: 'นามสกุล',
+    password: '123456',
+    email: 'eamil@gmail.com',
+    phoneNumber: '0900000000',
+    allowedTopicIds: 'trash, water, road, heat, animals, maintenance, trees, clean, other',
+    companyId: 1,
+    role: 'user', 
+  });
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  saveAs(blob, 'MemberTemplate.xlsx');
+};
+
+
 
 export default {}
 

@@ -3,6 +3,8 @@ import './css/MemberSettingsPage.css';
 import { addMember, deleteMember, getMembers } from '../action';
 import { useAlert } from '../components/AlertContext';
 import Alert from '../components/Alert';
+import { exportMemberTemplate } from '../components/PrintExcel';
+import UploadOfficerModal from '../components/UploadOfficerModal';
 
 const columns = [
   { key: 'name', label: 'ชื่อ-นามสกุล' },
@@ -146,7 +148,7 @@ const MemberSettings = () => {
      }
     console.log( " submit add form ",form)
   }
-
+ 
   return (
     <div className="member-settings">
       
@@ -156,6 +158,16 @@ const MemberSettings = () => {
         <button className="btn blue" onClick={() => setShowAddModal(true)}>
           เพิ่มเจ้าหน้าที่
         </button> &nbsp;
+        <button onClick={()=>exportMemberTemplate()} 
+           style={{
+              width:"fit-content" ,
+              padding:".5rem",
+              background:"#FFF",
+              fontSize:"small"
+          }} 
+          >
+          ดาวน์โหลด Template 
+        </button>
        
         </div>
       </div>
@@ -168,6 +180,7 @@ const MemberSettings = () => {
           onChange={(e) => setSearch(e.target.value)}
         />
 
+        <UploadOfficerModal />
          <div className="dropdown">
           <button className="btn" onClick={()=>{setFilter(prev => prev = !prev)}}>กรอง ▾</button>
           { filter && <div className="dropdown-content">
