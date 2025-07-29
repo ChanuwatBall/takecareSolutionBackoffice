@@ -113,6 +113,25 @@ export async function addMember(body:any) {
     return null
   }
 } 
+// /member/upload
+export async function uploadMember(body:any) {
+    try {
+    const token = await getCookie("auth_token") 
+    console.log("token ",token)
+    const response = await api.post( "member/upload" , body , { 
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return null
+  }
+} 
+
+
 export async function deleteMember(body:any) {
     try {
     const token = await getCookie("auth_token") 

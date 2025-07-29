@@ -36,7 +36,11 @@ const Navbar: React.FC<NavbarProps> = ({ onToggle }) => {
 
   // ปิด popup เมื่อคลิกข้างนอก
   useEffect(() => {
-    const getProfile=async()=>{ 
+    const getProfile=async()=>{  
+          const authToken =  await getCookie("auth_token");
+          if(!authToken){
+            handleLogout()
+          }
           const userinfo = await getCookie("user_info")
           setProfile(userinfo)
           console.log("userinfo ",userinfo)

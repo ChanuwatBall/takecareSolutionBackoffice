@@ -1,10 +1,9 @@
 import  { useEffect, useState } from 'react';
-import './css/MemberSettingsPage.css';
-import { addMember, deleteMember, getMembers } from '../action';
+import { addMember, deleteMember, getMembers, uploadMember } from '../action';
 import { useAlert } from '../components/AlertContext';
-import Alert from '../components/Alert';
-import { exportMemberTemplate } from '../components/PrintExcel';
+import Alert from '../components/Alert'; 
 import UploadOfficerModal from '../components/UploadOfficerModal';
+import './css/MemberSettingsPage.css';
 
 const columns = [
   { key: 'name', label: 'ชื่อ-นามสกุล' },
@@ -141,14 +140,27 @@ const MemberSettings = () => {
     }
     const result= await addMember(form)
     if(result?.result){ 
-       showAlert('เพิ่มเจ้าหน้าที่สำเร็จ', 'success')
+      getmemnbers()
+       showAlert('เพิ่ม/แก้ไข เจ้าหน้าที่สำเร็จ', 'success')
        setShowAddModal(false)
      }else{
-      showAlert('เพิ่มเจ้าหน้าที่ไม่สำเร็จ',"error")
+      showAlert('เพิ่ม/แก้ไข เจ้าหน้าที่ไม่สำเร็จ',"error")
      }
     console.log( " submit add form ",form)
   }
  
+  const uploadofficer=async(officers:any)=>{
+     console.log('Saving officers...', officers);
+        let update = officers.map((e:any)=>{ return {...e ,...{allowedTopicIds: e.allowedTopicIds.split(",") }}  })
+        console.log('update...', update);
+        const result = await uploadMember(update)
+         if(result?.result){ 
+           getmemnbers()
+          showAlert('เพิ่มเจ้าหน้าที่สำเร็จ', 'success')
+         }else{
+          showAlert('เพิ่มเจ้าหน้าที่ไม่สำเร็จ',"error")
+         }
+  }
   return (
     <div className="member-settings">
       
@@ -158,16 +170,7 @@ const MemberSettings = () => {
         <button className="btn blue" onClick={() => setShowAddModal(true)}>
           เพิ่มเจ้าหน้าที่
         </button> &nbsp;
-        <button onClick={()=>exportMemberTemplate()} 
-           style={{
-              width:"fit-content" ,
-              padding:".5rem",
-              background:"#FFF",
-              fontSize:"small"
-          }} 
-          >
-          ดาวน์โหลด Template 
-        </button>
+       
        
         </div>
       </div>
@@ -180,23 +183,25 @@ const MemberSettings = () => {
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        <UploadOfficerModal />
-         <div className="dropdown">
-          <button className="btn" onClick={()=>{setFilter(prev => prev = !prev)}}>กรอง ▾</button>
-          { filter && <div className="dropdown-content">
-            {columns.map((col) => (
-              <div key={col.key} className='text-left'
-                 >
-                <input
-                  type="checkbox"
-                  checked={!visibleCols.find((c) => c.key === col.key)?.hidden}
-                  onChange={() => toggleColumn(col.key)}
-                />{' '}
-                {col.label}
-              </div>
-            ))}
-          </div>}
-        </div>
+        <div  style={{ display:"flex", justifyContent: "space-between" ,alignItems:"flex-start"}} >
+          <UploadOfficerModal uploadHandler={(data:any)=>{uploadofficer(data)}} /> &nbsp;
+          <div className="dropdown">
+            <button className="btn" onClick={()=>{setFilter(prev => prev = !prev)}}>กรอง ▾</button>
+            { filter && <div className="dropdown-content">
+              {columns.map((col) => (
+                <div key={col.key} className='text-left'
+                  >
+                  <input
+                    type="checkbox"
+                    checked={!visibleCols.find((c) => c.key === col.key)?.hidden}
+                    onChange={() => toggleColumn(col.key)}
+                  />{' '}
+                  {col.label}
+                </div>
+              ))}
+            </div>}
+          </div>
+          </div>
       </div>
 
       <div className="table-wrapper">
@@ -207,7 +212,7 @@ const MemberSettings = () => {
               {visibleCols.map(
                 (col) => !col.hidden && <th key={col.key}>{col.label}</th>
               )}
-              <th></th>
+              <th style={{width:"10%"}}></th>
             </tr>
           </thead>
           <tbody>
@@ -223,7 +228,7 @@ const MemberSettings = () => {
                       </td>
                     )
                 )}
-                <td className="actions" style={{width:"5%"}}>
+                <td className="actions"  >
                   <button className="icon-btn" onClick={()=>{setMember(member);setupForm(member);setShowAddModal(true); console.log("member ",member)}} >
                     <img style={{width:"1rem"}} src="../icons/ionicons/create-outline.svg" />
                   </button>

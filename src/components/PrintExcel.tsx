@@ -3,6 +3,7 @@ import { saveAs } from 'file-saver';
 import ExcelJS, { Workbook } from 'exceljs'; 
 import { useState } from 'react';
 import "./css/PrintExcel.css" 
+import { getCookie } from '../action';
 
 
 const apiUrl = import.meta.env.VITE_API;
@@ -225,7 +226,7 @@ export const PrintExcelComplaint= ({jsonData}:any ) => {
 export const exportMemberTemplate = async () => {
   const workbook = new Workbook();
   const worksheet = workbook.addWorksheet('Template');
-
+  const user = await getCookie("user_info")
   // Header
   worksheet.columns = [
     { header: 'name', key: 'name', width: 15 },
@@ -243,10 +244,10 @@ export const exportMemberTemplate = async () => {
     name: 'ชื่อจริง',
     username: 'นามสกุล',
     password: '123456',
-    email: 'eamil@gmail.com',
+    email: 'email@gmail.com',
     phoneNumber: '0900000000',
     allowedTopicIds: 'trash, water, road, heat, animals, maintenance, trees, clean, other',
-    companyId: 1,
+    companyId: user?.companyId ,
     role: 'user', 
   });
 

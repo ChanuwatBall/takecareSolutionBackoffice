@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
+import type { ChangeEvent, DragEvent } from 'react';
 import "./css/UploadOfficerModal.css"
+import { exportMemberTemplate } from './PrintExcel';
+import { uploadMember } from '../action';
+import { useAlert } from './AlertContext';
 
 interface Officer {
   name: string;
@@ -8,19 +12,47 @@ interface Officer {
   password: string;
   email: string;
   phoneNumber: string;
-  allowedTopicIds: string[];
+  allowedTopicIds: string;
   companyId: number;
   role: string;
   token: string | null;
 }
 
-const UploadOfficerModal = () => {
+const UploadOfficerModal = ({uploadHandler}:any) => {
   const [open ,setOpen] = useState(false)
   const [officers, setOfficers] = useState<Officer[]>([]);
   const [fileName, setFileName] = useState<string>('');
+  const [dragActive, setDragActive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null); 
+ 
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleSubmit = async() => {
+    setOpen(false)
+    uploadHandler(officers)
+    console.log('Saving officers...', officers);
+    // let update = officers.map((e)=>{ return {...e ,...{allowedTopicIds: e.allowedTopicIds.split(",") }}  })
+    // console.log('update...', update);
+    // const result = await uploadMember(update)
+    //  if(result?.result){ 
+    //   showAlert('เพิ่มเจ้าหน้าที่สำเร็จ', 'success')
+    //  }else{
+    //   showAlert('เพิ่มเจ้าหน้าที่ไม่สำเร็จ',"error")
+    //  }
+  };
+    const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setDragActive(false);
+      handleFiles(e.dataTransfer.files);
+    };
+  
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+      handleFiles(e.target.files);
+    };
+   
+    
+  const handleFiles = async (files: FileList | null) => {
+    console.log("handleFileUpload file ",files )
+    const file = files?.[0];
     if (!file) return;
     setFileName(file.name);
 
@@ -31,47 +63,69 @@ const UploadOfficerModal = () => {
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
       const data = XLSX.utils.sheet_to_json<Officer>(ws);
+      console.log("data ",data)
       setOfficers(data);
     };
     reader.readAsBinaryString(file);
-  };
+  }
 
-  const handleSubmit = () => {
-    console.log('Saving officers...', officers);
-    // TODO: Submit to backend
-  };
 
   return (
     <div className='upload-officer'>  
      <button className="btn" onClick={()=>{setOpen(true)}} >  อัปโหลดข้อมูล </button>
     {/* <button></button> */}
-   {open &&  <div className="modal-overlay">
-      <div className="modal">
-        <h2>เพิ่มเจ้าหน้าที่</h2>
+   {open && <div className="modal">
+    <div className="modal-content" style={{width:"70vw"}}>
+      {/* <div className="modal"> */}
+        <div className='set-center' style={{width:"100%", flexDirection:"row" , justifyContent:"space-between", alignItems:"flex-start"}} >
+          <label style={{lineHeight:"1.1rem"}}>
+            <h2 className='text-left'  style={{margin:"0px"}}>
+              เพิ่มเจ้าหน้าที่ 
+            </h2>
+            <p className='text-left'>ไฟล์: <strong>{fileName}</strong></p>
+           </label>
+           <button onClick={()=>exportMemberTemplate()} 
+            style={{
+                width:"fit-content" ,
+                padding:".5rem",
+                background:"#c0edcb",
+                fontSize:"small" , 
+            }} 
+          >
+          ดาวน์โหลด Template 
+        </button>
+        </div> <br/>
 
-        {!officers.length ? (
-          <label htmlFor="file-upload" className="drop-zone">
-            <input
-              id="file-upload"
-              type="file"
-              accept=".xlsx, .xls"
-              onChange={handleFileUpload}
-              hidden
+        {!officers.length ? ( 
+           <div style={{height:"10rem"}}
+            className={`set-center upload-area ${dragActive ? 'drag-active' : ''}`}
+            onDragOver={(e) => {
+                e.preventDefault();
+                setDragActive(true);
+            }}
+            onDragLeave={() => setDragActive(false)}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            >
+            <p>ลาก & วางไฟล์ที่นี่<br/>หรือคลิกเพื่อเลือกไฟล์</p>
+              <input
+              ref={fileInputRef}
+              type="file"  accept=".xlsx, .xls" 
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
             />
-            <p>ลาก & วางไฟล์ที่นี่<br />คลิกเพื่ออัปโหลด</p>
-          </label>
+            </div> 
         ) : (
           <>
-            <p>ไฟล์: <strong>{fileName}</strong></p>
             <table>
               <thead>
                 <tr>
-                  <th>ชื่อจริง</th>
+                  <th style={{width:"10%"}}>ชื่อจริง</th>
                   <th>นามสกุล</th>
                   <th>Email</th>
                   <th>เบอร์โทร</th>
-                  <th>สิทธิ์</th>
-                  <th>บทบาท</th>
+                  <th className='text-center' >เรื่องร้องทุกข์</th>
+                  <th>สิทธิ</th>
                 </tr>
               </thead>
               <tbody>
@@ -81,17 +135,20 @@ const UploadOfficerModal = () => {
                     <td>{o.username}</td>
                     <td>{o.email}</td>
                     <td>{o.phoneNumber}</td>
-                    <td>{o.allowedTopicIds?.join(', ')}</td>
+                    <td>{o.allowedTopicIds?.split(',')}</td>
                     <td>{o.role}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <button className="submit-btn" onClick={handleSubmit}>บันทึก</button>
           </>
-        )}
-      </div>
- 
+        )} <br/>
+        <div className="modal-actions " style={{margin:"0px",marginTop:".5rem"}}>
+          <button  onClick={()=>{setOpen(false);setOfficers([])}} >ยกเลิก</button>  &nbsp; 
+          <button  type='submit' onClick={()=>handleSubmit()}  >บันทึก</button>
+        </div>
+        
+      </div> 
     </div>}
     </div>
   );
