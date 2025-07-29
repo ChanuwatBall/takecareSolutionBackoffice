@@ -80,44 +80,100 @@ const Dashboard = () => {
         />
       </div>
 
-      <div className="card line-chart" id='card-line-chart'>
+      <div className="card line-chart" id='card-line-chart'> 
         <h3>สมาชิกที่ทำการลงทะเบียน</h3>
-        <MemberRegisterLineChart wrapid="card-line-chart"  data={memberStats} setLine={(e:any) => setLine(e)} />
+        <MemberRegisterLineChart
+         wrapid="card-line-chart"  
+         data={memberStats} 
+         setLine={(e:any) => setLine(e)}  
+         selectedMonth={selectedMonth} 
+         next={()=>{ setSelectedMonth(moment(selectedMonth).add(1,"month").format("YYYY-MM")) }}
+         prev={()=>{ setSelectedMonth(moment(selectedMonth).subtract(1,"month").format("YYYY-MM")) }}
+        />
         {/* <Line data={memberStats} /> */}
       </div>
 
-      <div className="card-row">
-        <div className="card">
+      <div className="card-row" >
+        <div className="card" style={{width:"50%"}}>
           <h3>การเพิ่มเรื่องร้องทุกข์</h3>
-          <p>จำนวนเรื่องทั้งหมด: 1130 เรื่อง</p>
-          <p>จำนวนครั้งการเพิ่มเรื่อง: 5 ครั้ง</p>
-          <p>จำนวนชื่อร้องทุกข์ซ้ำ: 5 เรื่อง</p>
+          <div style={{width:"100%" }} className='set-row'> 
+            <label>จำนวนเรื่องทั้งหมด: </label>
+            <label>1130 เรื่อง</label>
+          </div> 
+          <div style={{width:"100%" }} className='set-row'> 
+            <label>จำนวนครั้งการเพิ่มเรื่อง: </label>
+            <label>5 เรื่อง</label>
+          </div> 
+          <div style={{width:"100%" }} className='set-row'> 
+            <label>จำนวนชื่อร้องทุกข์ซ้ำ: </label>
+            <label>5 เรื่อง</label>
+          </div> 
+          
         </div>
-        <div className="card">
+        <div className="card"  style={{width:"50%"}} >
           <h3>การดำเนินการเรื่องร้องทุกข์</h3>
-          <p>ดำเนินการแล้ว: 612 เรื่อง</p>
-          <p>เสร็จสมบูรณ์: 600 เรื่อง</p>
+          <div style={{width:"100%" }} className='set-row'> 
+            <label>ดำเนินการแล้ว: </label>
+            <label>612 เรื่อง</label>
+          </div> 
+           <div style={{width:"100%" }} className='set-row'> 
+            <label>เสร็จสมบูรณ์: </label>
+            <label>600 เรื่อง</label>
+          </div>  
         </div>
       </div>
 
       <div className="card-row">
-        <div className="card">
-          <h3>เรื่องร้องทุกข์ทั้งหมด</h3>
-          <h1>{complaintSummary.total.toLocaleString()}</h1>
-          <ul>
-            <li style={{ color: '#4CAF50' }}>ได้รับการแก้ไข: {complaintSummary.resolved} เรื่อง</li>
-            <li style={{ color: '#F44336' }}>กำลังดำเนินการ: {complaintSummary.inProgress} เรื่อง</li>
-          </ul>
-        </div>
-        <div className="card">
-          <Pie data={complaintChartData} />
+        <div className="card set-row" style={{width:"100%"}}>
+          <div style={{width:"40%"}} > 
+            <div style={{border:"1px solid #E5E5E5",padding:".7rem " , borderRadius:"10px"}} >
+              <h3  style={{margin:"0"}}>เรื่องร้องทุกข์ทั้งหมด</h3>
+              <h1 style={{margin:"0" }}>{complaintSummary.total.toLocaleString()}</h1>
+            </div> 
+            <ul style={{width:"80%"}} >
+              <li className='set-row' >
+                <div className='set-row' style={{ alignItems:"center" }} >
+                  <div style={{width:"1rem" , height:"1rem" , borderRadius:"5px",backgroundColor:  '#4CAF50' }} ></div> &nbsp;
+                  <label> ได้รับการแก้ไข:  </label>
+                </div> 
+                <label> {complaintSummary.resolved} เรื่อง </label>
+              </li>
+              <li className='set-row' >
+                <div className='set-row' style={{ alignItems:"center" }} >
+                  <div style={{width:"1rem" , height:"1rem" , borderRadius:"5px",backgroundColor:  '#F44336' }} ></div> &nbsp;
+                  <label> กำลังดำเนินการ:  </label>
+                </div> 
+                <label> {complaintSummary.inProgress} เรื่อง </label>
+              </li>
+              {/* <li style={{ color: '#F44336' }}>กำลังดำเนินการ: {complaintSummary.inProgress} เรื่อง</li> */}
+            </ul>
+          </div>
+        
+          {/* </div>
+          <div className="card"> */}
+          <div style={{width:"50%"}} className='set-center' > 
+            <Pie data={complaintChartData} style={{height:"17rem"}} options={{  plugins: {
+                legend: {
+                    display: false, 
+                }
+            }}} />
+          </div>
         </div>
       </div>
 
-      <div className="card">
-        <h3>รายชื่อสมาชิก</h3>
-        <p className="member-count">จำนวนสมาชิก: 2,248</p>
+      <h3 style={{textAlign:"left"}} >รายชื่อสมาชิก</h3>
+      <div className="card" style={{width:"50%",maxWidth:"25rem",height:"10rem" , minWidth:"25rem"}}> 
+        <h3>จำนวนสมาชิก</h3>
+        <p className="member-count"> 2,248</p>
+      </div>
+
+
+      <div className="card set-row" style={{maxWidth:"35rem",padding:"1rem"}}>
         <input type="text" placeholder="ค้นหาจาก ชื่อ หรือ หมายเลขโทรศัพท์" className="search-input" />
+        <img src="../icons/ionicons/search-outline.svg"   style={{opacity:".2", width:"2rem"}}/> 
+      </div>
+
+      <div className="card"> 
         <table className="member-table">
           <thead>
             <tr>
@@ -133,7 +189,7 @@ const Dashboard = () => {
               <th>วันที่สมัคร</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody >
             {members.map((m, idx) => (
               <tr key={idx}>
                 <td>{m.name}</td>
@@ -158,7 +214,7 @@ const Dashboard = () => {
 export default Dashboard;
 
 
-const MemberRegisterLineChart=({wrapid , data , setLine}:any)=>{
+const MemberRegisterLineChart=({wrapid , data , setLine ,selectedMonth , next , prev}:any)=>{
   var options:any = {
     chart: {
       type: 'line' , 
@@ -226,7 +282,7 @@ const MemberRegisterLineChart=({wrapid , data , setLine}:any)=>{
       console.log("labels ",labels)
 
       options = {...options , ...{
-        chart:{ type: 'line' ,  height:el.offsetHeight*2} , 
+        chart:{ type: 'line' ,  height:el.offsetHeight*1.5} , 
         xaxis: {  show: true,  
                 tickPlacement: 'on', type: 'datetime', categories: labels,
                 labels: { format: 'dd MMM', 
@@ -250,10 +306,24 @@ const MemberRegisterLineChart=({wrapid , data , setLine}:any)=>{
 
   return(
     <div> 
-      <div style={{width:"100%", display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-        <label>สมาชิก</label>
-         <label>สมาชิก</label>
-         <></>
+      <div style={{width:"100%", display:"flex",flexDirection:"row",justifyContent:"space-between" , alignItems:"center",maxHeight:"2rem"}}>
+        
+          <label style={{fontSize:".7em",marginLeft:"5%"}}>สมาชิก</label>
+       
+         <div style={{display:"flex",flexDirection:"row",justifyContent:"center",alignItems:"center"}}>
+          <button style={{ padding:".5rem", background:"transparent"}}
+           onClick={()=>{prev()}}
+          >  
+              <img src="../icons/ionicons/chevron-back.svg" className={'icon-carret '} style={{opacity:".4"}} /> 
+          </button>
+          <div><label style={{fontSize:".7em"}} >{moment(selectedMonth).format("MMMM YYYY")}</label></div>
+          <button style={{padding:".5rem", background:"transparent"}} 
+           onClick={()=>{next()}}
+          >  
+              <img src="../icons/ionicons/chevron-forward.svg" className={'icon-carret '} style={{opacity:".4"}}/> 
+          </button>
+         </div>
+         <div style={{width:"3rem"}}></div>
       </div>
      <div id='member-register-linechart'>  </div>
     </div>

@@ -19,32 +19,73 @@
 
 .card {
   background: #fff;
-  border-radius: 12px;
+  border-radius: 15px;
   padding: 16px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  text-align: left;
 }
 .line-chart{
-    max-height: 20rem;
+    /* max-height: 28rem; */
     text-align: left;
+}
+.set-row{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-self: center;
 }
 .card-row {
   display: flex;
   gap: 20px;
   margin-bottom: 20px;
+  width: 100%;
+}
+.card-row p ,.card-row label {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: .75em;
+  font-weight: 400;
 }
 
+.card-row h3 { 
+  font-size: .9em;
+
+  font-family: "Prompt", sans-serif;
+  font-weight: 500 !important;
+  font-style: normal;
+}
+.card-row h1 {  
+  font-family: "Prompt", sans-serif;
+  font-weight: 400 !important;
+  font-style: normal;
+}
+.member-count{
+  font-size: 3rem;
+  margin: 0px;
+  font-weight: 300 !important;
+}
 .member-table {
   width: 100%;
-  border-collapse: collapse;
+  /* border-collapse: collapse; */
   margin-top: 16px;
 }
 
-.member-table th,
-.member-table td {
-  border: 1px solid #ccc;
+.member-table tr th ,
+.member-table tr td{
+   border: none;
+   font-weight: 500;
   padding: 8px;
-  text-align: left;
+  text-align: center;
+}
+
+.member-table thead {
+  border-bottom: 1px solid #E7E7E6;
+}
+.member-table td { 
+  /* padding: 8px;
+  text-align: left; */
+  font-size: .75em;
 }
 
 .status-tag.success {
@@ -53,4 +94,14 @@
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 0.9em;
+}
+
+.search-input{
+  width: 100%;
+  height: 3rem;
+  border: none;
+}
+.search-input::placeholder {
+  color: #C9C9C9; /* Change text color */ 
+  font-size:  1.4em; /* Adjust font size */
 }
