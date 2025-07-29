@@ -167,7 +167,7 @@ const MemberRegisterLineChart=({wrapid , data , setLine}:any)=>{
       name: 'sales',
       data:  data?.data
     }],
-    
+    toolbar:{ show:false },
     // xaxis: {
     //   categories: data?.labels, // [1991,1992,1993,1994,1995,1996,1997, 1998,1999]
     // }
@@ -176,18 +176,36 @@ const MemberRegisterLineChart=({wrapid , data , setLine}:any)=>{
                return  moment(value).lang("th").format("DD MMM") 
             } },
         },
+    stroke: {
+        show: true,
+        curve: 'straight',
+        // lineCap: 'butt',
+        colors: "#13147D",
+        width: 1,
+        // dashArray: 0, 
+    },
+
     zoom: {
       type: 'x' ,
       enabled: true ,
       autoScaleYaxis: false
     },
+     yaxis: {
+      labels: {
+            style: {
+              colors: ["#66676D"],
+            },
+      }
+     },
      grid: {
+       strokeDashArray: 1,
+       borderColor: '#E0E0E0',
           xaxis: {
             lines: {
               show: true,
             },
           },
-          yaxis: {
+          yaxis: { 
             lines: {
               show: true,
             },
@@ -211,7 +229,11 @@ const MemberRegisterLineChart=({wrapid , data , setLine}:any)=>{
         chart:{ type: 'line' ,  height:el.offsetHeight*2} , 
         xaxis: {  show: true,  
                 tickPlacement: 'on', type: 'datetime', categories: labels,
-                labels: { format: 'dd MMM',  },
+                labels: { format: 'dd MMM', 
+                  style: {
+                      colors: ["#66676D"],
+                    },
+                 },
             }}
         }
 
@@ -227,6 +249,13 @@ const MemberRegisterLineChart=({wrapid , data , setLine}:any)=>{
   },[])
 
   return(
-    <div id='member-register-linechart'>  </div>
+    <div> 
+      <div style={{width:"100%", display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
+        <label>สมาชิก</label>
+         <label>สมาชิก</label>
+         <></>
+      </div>
+     <div id='member-register-linechart'>  </div>
+    </div>
   )
 }
