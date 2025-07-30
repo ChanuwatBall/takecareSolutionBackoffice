@@ -37,17 +37,7 @@ const Dashboard = () => {
     const [members,setMember] = useState<any[]>([])
     const [search, setSearch] = useState("");
     const [membersCount,setMemberCount] = useState("0")
-    const [complaintChartData , setComplaintChartData] = useState<any>({
-        labels: ['ได้รับการแก้ไข', 'กำลังดำเนินการ'],
-        datasets: [
-          {
-            label: 'เรื่องร้องทุกข์',
-            data: [0 , 0 ],
-            backgroundColor: ['#4CAF50', '#F44336'],
-            hoverOffset: 4,
-          },
-        ],
-      })
+   
 
     const [complaintSummary , setcomplaintSummary] = useState<any>({
       total: 0,
@@ -219,7 +209,7 @@ const Dashboard = () => {
          
           <div id="wrap-piechart" style={{width:"50%", height:"15rem"}} className='set-center' > 
              
-            <ComplaintPieChart data={complaintChartData} wrapid={"wrap-piechart"} /> 
+            <ComplaintPieChart data={{}} wrapid={"wrap-piechart"} /> 
             {/* // <Pie data={complaintChartData}  options={{  plugins: {
             //     legend: {
             //         display: false, 
@@ -288,7 +278,7 @@ const Dashboard = () => {
 export default Dashboard;
 
 
-const ComplaintPieChart =({data,wrapid}:any)=>{
+const ComplaintPieChart =({data}:any)=>{
  
 
   let options = {
@@ -324,10 +314,8 @@ const ComplaintPieChart =({data,wrapid}:any)=>{
 
    useEffect(()=>{
     console.log("data ",data)
-    const createchart=()=>{
-        const el:any = document.getElementById(wrapid)
+    const createchart=()=>{ 
         const chartcontetnt:any = document.querySelector("#complaint-status-piechart") 
-         
 
       if( chartcontetnt?.innerHTML.length < 20){
         piechart = new ApexCharts(chartcontetnt, options); 
@@ -404,6 +392,7 @@ const MemberRegisterLineChart=({wrapid , data , setLine ,selectedMonth , next , 
       console.log(el.offsetHeight)
       const startOfMonth = moment().startOf('month').format();
        Array.from(Array(30-labels.length)).map((label,index)=>{
+        console.log("label ",label)
           labels = [...labels , moment(startOfMonth).add(index,'days').subtract(1,"month").format("YYYY-MM-DD")  ]
        }
       );
