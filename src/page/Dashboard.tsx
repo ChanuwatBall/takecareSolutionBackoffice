@@ -18,6 +18,8 @@ import { dashboardCoplaintSummary, dashboardMembers, dashboardMemberStats } from
 
 moment.locale('th')
 
+var piechart: ApexCharts | null = null
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -34,6 +36,7 @@ const Dashboard = () => {
     // const [linechart ,setLine] = useState<any>(null)
     const [memberStats , setMemberState] = useState<any>({})
     const [members,setMember] = useState<any[]>([])
+    const [search, setSearch] = useState("");
     const [membersCount,setMemberCount] = useState("0")
     const [complaintChartData , setComplaintChartData] = useState<any>(null)
     const [complaintSummary , setcomplaintSummary] = useState<any>({
@@ -75,6 +78,9 @@ const Dashboard = () => {
           },
         ],
       })
+      piechart?.updateSeries([{ 
+          data:  [complaintSummary?.doneInMonth , complaintSummary?.inProgressInMonth ]
+        }])
 
       const dashmember = await dashboardMembers();
       console.log("dashmember ",dashmember)
@@ -105,19 +111,10 @@ const Dashboard = () => {
       setcomplaintSummary(cpsumm) 
   }
  
-
-  // const complaintChartData = {
-  //   labels: ['ได้รับการแก้ไข', 'กำลังดำเนินการ'],
-  //   datasets: [
-  //     {
-  //       label: 'เรื่องร้องทุกข์',
-  //       data: [1097, 612],
-  //       backgroundColor: ['#4CAF50', '#F44336'],
-  //       hoverOffset: 4,
-  //     },
-  //   ],
-  // };
-
+  const filteredMembers = members.filter((m) =>
+    `${m.name} ${m.phone} `.toLowerCase().includes(search.toLowerCase())
+  );
+ 
  
   return (
     <div style={{ background: "#f5f5f5", minHeight: "100vh", padding: "2rem" }}> 
@@ -201,19 +198,19 @@ const Dashboard = () => {
                   <label> กำลังดำเนินการ:  </label>
                 </div> 
                 <label> {complaintSummary?.inProgress} เรื่อง </label>
-              </li>
-              {/* <li style={{ color: '#F44336' }}>กำลังดำเนินการ: {complaintSummary.inProgress} เรื่อง</li> */}
+              </li> 
             </ul>
           </div>
-        
-          {/* </div>
-          <div className="card"> */}
-          <div style={{width:"50%", height:"15rem"}} className='set-center' > 
-            {complaintChartData && <Pie data={complaintChartData}  options={{  plugins: {
-                legend: {
-                    display: false, 
-                }
-            }}} />}
+         
+          <div id="wrap-piechart" style={{width:"50%", height:"15rem"}} className='set-center' > 
+            {complaintChartData &&
+            <ComplaintPieChart data={complaintChartData} wrapid={"wrap-piechart"} /> 
+            // <Pie data={complaintChartData}  options={{  plugins: {
+            //     legend: {
+            //         display: false, 
+            //     }
+            // }}} />
+            }
           </div>
         </div>
       </div>
@@ -226,7 +223,12 @@ const Dashboard = () => {
 
 
       <div className="card set-row" style={{maxWidth:"35rem",padding:"1rem"}}>
-        <input type="text" placeholder="ค้นหาจาก ชื่อ หรือ หมายเลขโทรศัพท์" className="search-input" />
+        <input 
+          type="text" 
+          placeholder="ค้นหาจาก ชื่อ หรือ หมายเลขโทรศัพท์" className="search-input" 
+          value={search}
+          onChange={(e) => setSearch(e.target.value)} 
+        />
         <img src="../icons/ionicons/search-outline.svg"   style={{opacity:".2", width:"2rem"}}/> 
       </div>
 
@@ -247,7 +249,7 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody >
-            {members.map((m, idx) => (
+            {filteredMembers.map((m, idx) => (
               <tr key={idx}>
                 <td style={{textAlign:"left"}}>{m.name}</td>
                 <td>{m.phone}</td>
@@ -270,7 +272,75 @@ const Dashboard = () => {
 }
 export default Dashboard;
 
-  var chart: ApexCharts | null = null
+
+const ComplaintPieChart =({data,wrapid}:any)=>{
+  data={
+        labels: ['ได้รับการแก้ไข', 'กำลังดำเนินการ'],
+        datasets: [
+          {
+            label: 'เรื่องร้องทุกข์',
+            data: [0 , 0 ],
+            backgroundColor: ['#4CAF50', '#F44336'],
+            hoverOffset: 4,
+          },
+        ],
+      }
+
+  let options = {
+     chart: {
+       height: 380,
+       type: 'pie',
+     },
+     series: data?.data  ,
+     labels: data?.labels ,
+     responsive: [{
+       breakpoint: 480,
+       options: {
+         chart: {
+           width: 200
+         },
+         legend: {
+           position: 'bottom'
+         }
+       }
+     }]
+   } 
+
+   useEffect(()=>{
+    const createchart=()=>{
+        const el:any = document.getElementById(wrapid)
+        const chartcontetnt:any = document.querySelector("#complaint-status-piechart") 
+        
+        options = {...options , ...{
+          chart:{ type: 'line' ,  height:el.offsetHeight*1.5} , 
+          xaxis: {  show: true,  
+                  tickPlacement: 'on', type: 'datetime', categories: data?.labels,
+                  labels: { format: 'dd MMM', 
+                    style: {
+                        colors: ["#66676D"],
+                      },
+                  },
+              }}
+          }
+
+      if( chartcontetnt?.innerHTML.length < 20){
+        piechart = new ApexCharts(chartcontetnt, options); 
+        piechart.render(); 
+        piechart.updateOptions(options)
+      }else{  
+      } 
+    }
+    createchart()
+  },[])
+
+  return(
+    <div>
+      <div id='complaint-status-piechart'>  </div>
+    </div>
+  )
+}
+ 
+var chart: ApexCharts | null = null
 const MemberRegisterLineChart=({wrapid , data , setLine ,selectedMonth , next , prev }:any)=>{
 
   var options:any = {
