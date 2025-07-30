@@ -9,8 +9,7 @@ import {
   ArcElement,
   Tooltip,
   Legend,
-} from 'chart.js';
-import {  Pie } from 'react-chartjs-2';
+} from 'chart.js'; 
 import ApexCharts from 'apexcharts';
 import moment from 'moment';
 import "./css/Dashboard.css"
@@ -38,7 +37,18 @@ const Dashboard = () => {
     const [members,setMember] = useState<any[]>([])
     const [search, setSearch] = useState("");
     const [membersCount,setMemberCount] = useState("0")
-    const [complaintChartData , setComplaintChartData] = useState<any>(null)
+    const [complaintChartData , setComplaintChartData] = useState<any>({
+        labels: ['ได้รับการแก้ไข', 'กำลังดำเนินการ'],
+        datasets: [
+          {
+            label: 'เรื่องร้องทุกข์',
+            data: [0 , 0 ],
+            backgroundColor: ['#4CAF50', '#F44336'],
+            hoverOffset: 4,
+          },
+        ],
+      })
+
     const [complaintSummary , setcomplaintSummary] = useState<any>({
       total: 0,
       resolved: 0,
@@ -66,21 +76,13 @@ const Dashboard = () => {
       console.log("cpsumm ",cpsumm)
       setcomplaintSummary(cpsumm)
 
-      
-      setComplaintChartData({
-        labels: ['ได้รับการแก้ไข', 'กำลังดำเนินการ'],
-        datasets: [
-          {
-            label: 'เรื่องร้องทุกข์',
-            data: [complaintSummary?.doneInMonth , complaintSummary?.inProgressInMonth ],
-            backgroundColor: ['#4CAF50', '#F44336'],
-            hoverOffset: 4,
-          },
-        ],
-      })
-      piechart?.updateSeries([{ 
-          data:  [complaintSummary?.doneInMonth , complaintSummary?.inProgressInMonth ]
-        }])
+      const donePercen = (cpsumm?.doneInMonth / cpsumm?.total) * 100;
+      const inProcessPercen = (cpsumm?.inProgressInMonth / cpsumm?.total) * 100;
+      const pendingPercen = (cpsumm?.pendingInMonth / cpsumm?.total) * 100; 
+     
+      piechart?.updateSeries(
+           [donePercen , inProcessPercen + pendingPercen],
+        )
 
       const dashmember = await dashboardMembers();
       console.log("dashmember ",dashmember)
@@ -92,7 +94,7 @@ const Dashboard = () => {
 
   const changeMonth=async (chart:any,month:any)=>{
     setSelectedMonth(month)
-      console.log("month ",month)
+     console.log("month ",month)
     const memberStats = await dashboardMemberStats(month) 
       console.log("linechart ",linechart)
       console.log("memberStats ",memberStats)
@@ -108,7 +110,14 @@ const Dashboard = () => {
 
       const cpsumm = await dashboardCoplaintSummary(month) 
       console.log("cpsumm ",cpsumm)
-      setcomplaintSummary(cpsumm) 
+      setcomplaintSummary(cpsumm)  
+      const donePercen = (cpsumm?.doneInMonth / cpsumm?.total) * 100;
+      const inProcessPercen = (cpsumm?.inProgressInMonth / cpsumm?.total) * 100;
+      const pendingPercen = (cpsumm?.pendingInMonth / cpsumm?.total) * 100; 
+     
+      piechart?.updateSeries(
+           [donePercen , inProcessPercen + pendingPercen],
+        )
   }
  
   const filteredMembers = members.filter((m) =>
@@ -128,8 +137,14 @@ const Dashboard = () => {
         />
       </div>
 
-      <div className="card line-chart" id='card-line-chart'> 
-        <h3>สมาชิกที่ทำการลงทะเบียน</h3>
+      <div className="card line-chart" id='card-line-chart'>  
+        <div className='set-row' >
+           <h3>สมาชิกที่ทำการลงทะเบียน</h3>
+           <div className='set-row' style={{justifyContent:"center",alignItems:"center"}}>
+            <div style={{width:".8rem",height:".8rem",borderRadius:"50%",background: "#3E39FB"}}></div> &nbsp;
+            <label style={{fontSize:".8em", margin:"0px",fontWeight:"400"}}>จำนวนสมาชิกที่ทำการลงทะเบียน</label>
+           </div>
+        </div>
         <MemberRegisterLineChart
          wrapid="card-line-chart"  
          data={memberStats} 
@@ -197,20 +212,20 @@ const Dashboard = () => {
                   <div style={{width:"1rem" , height:"1rem" , borderRadius:"5px",backgroundColor:  '#F44336' }} ></div> &nbsp;
                   <label> กำลังดำเนินการ:  </label>
                 </div> 
-                <label> {complaintSummary?.inProgress} เรื่อง </label>
+                <label> {complaintSummary?.inProgress + complaintSummary?.pendingInMonth } เรื่อง </label>
               </li> 
             </ul>
           </div>
          
           <div id="wrap-piechart" style={{width:"50%", height:"15rem"}} className='set-center' > 
-            {complaintChartData &&
+             
             <ComplaintPieChart data={complaintChartData} wrapid={"wrap-piechart"} /> 
-            // <Pie data={complaintChartData}  options={{  plugins: {
+            {/* // <Pie data={complaintChartData}  options={{  plugins: {
             //     legend: {
             //         display: false, 
             //     }
-            // }}} />
-            }
+            // }}} /> */}
+             
           </div>
         </div>
       </div>
@@ -274,25 +289,26 @@ export default Dashboard;
 
 
 const ComplaintPieChart =({data,wrapid}:any)=>{
-  data={
-        labels: ['ได้รับการแก้ไข', 'กำลังดำเนินการ'],
-        datasets: [
-          {
-            label: 'เรื่องร้องทุกข์',
-            data: [0 , 0 ],
-            backgroundColor: ['#4CAF50', '#F44336'],
-            hoverOffset: 4,
-          },
-        ],
-      }
+ 
 
   let options = {
      chart: {
-       height: 380,
+       height: 250,
        type: 'pie',
      },
      series: data?.data  ,
      labels: data?.labels ,
+     legend: { show: false },
+     colors : ['#4CAF50', '#F44336'], 
+     yaxis: { 
+       axisBorder: { show: false } ,
+       labels: {  show: false, }
+     },
+     dataLabels: {
+       enabled: false },
+     tooltip: {
+       enabled: false,
+     },
      responsive: [{
        breakpoint: 480,
        options: {
@@ -307,26 +323,16 @@ const ComplaintPieChart =({data,wrapid}:any)=>{
    } 
 
    useEffect(()=>{
+    console.log("data ",data)
     const createchart=()=>{
         const el:any = document.getElementById(wrapid)
         const chartcontetnt:any = document.querySelector("#complaint-status-piechart") 
-        
-        options = {...options , ...{
-          chart:{ type: 'line' ,  height:el.offsetHeight*1.5} , 
-          xaxis: {  show: true,  
-                  tickPlacement: 'on', type: 'datetime', categories: data?.labels,
-                  labels: { format: 'dd MMM', 
-                    style: {
-                        colors: ["#66676D"],
-                      },
-                  },
-              }}
-          }
+         
 
       if( chartcontetnt?.innerHTML.length < 20){
         piechart = new ApexCharts(chartcontetnt, options); 
         piechart.render(); 
-        piechart.updateOptions(options)
+        // piechart.updateOptions(options)
       }else{  
       } 
     }
@@ -436,7 +442,7 @@ const MemberRegisterLineChart=({wrapid , data , setLine ,selectedMonth , next , 
     <div> 
       <div style={{width:"100%", display:"flex",flexDirection:"row",justifyContent:"space-between" , alignItems:"center",maxHeight:"2rem"}}>
         
-          <label style={{fontSize:".7em",marginLeft:"5%"}}>สมาชิก</label>
+          <label style={{fontSize:".7em",marginLeft:"5%", color: "#AEAEAE"}}>สมาชิก</label>
        
          <div style={{display:"flex",flexDirection:"row",justifyContent:"center",alignItems:"center"}}>
           <button style={{ padding:".5rem", background:"transparent"}}

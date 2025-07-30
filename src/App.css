@@ -20,6 +20,7 @@ label , p , b ,u , i ,strong , h1 ,h2,h3,h4,h5,h6,div,span , input , select , te
    color: #4D4D4D ;
     font-family: "Prompt", sans-serif;
 }
+label{margin: 0px !important; }
 b , strong , h1 ,h2,h3,h4,h5,h6{ 
   font-family: "Prompt", sans-serif;
   font-weight: 500 !important;
