@@ -95,6 +95,13 @@
   border-radius: 6px;
   font-size: 0.9em;
 }
+.status-tag.danger {
+  background-color: #af4c4c;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
 
 .search-input{
   width: 100%;

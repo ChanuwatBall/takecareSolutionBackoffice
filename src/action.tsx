@@ -207,9 +207,46 @@ export async function dashboardMemberStats(month:any) {
     return {result: false , description: error?.message}
   }
 }
-///dashboard/memberstats
 
-///complaint/updatestatus
+///dashboard/complaintsumm
+export async function dashboardCoplaintSummary(month:any) {
+ try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.post( "dashboard/complaintsumm" , {} , { 
+       params:{  
+        month: month
+      },
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return {result: false , description: error?.message}
+  }
+}
+
+///dashboard/members
+export async function dashboardMembers() {
+ try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.post( "dashboard/members" , {} , { 
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return {result: false , description: error?.message}
+  }
+}
+
 export async function updateComplaintSts(complaint:any) {
  try {
     const token = await getCookie("auth_token")
