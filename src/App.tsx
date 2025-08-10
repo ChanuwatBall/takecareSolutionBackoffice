@@ -18,6 +18,7 @@ import Activities from "./page/Activities";
 import { AlertProvider } from "./components/AlertContext";
 import Setting from "./page/Setting";
 import MemberSettings from "./page/MemberSettings";
+import CompanyManagement from "./page/CompanyManagement";
 
 
 function App() { 
@@ -88,6 +89,12 @@ const Layout: React.FC = () => {
                   <MemberSettings /> 
                 </ProtectedRoute>} 
             />
+             <Route path="/company/manage" element={
+                <ProtectedRoute> 
+                  <CompanyManagement /> 
+                </ProtectedRoute>} 
+            />
+            
             
 
             

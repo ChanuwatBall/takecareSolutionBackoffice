@@ -335,7 +335,40 @@ export async function updateActivityStatus(body:any) {
   }
 }
 
-//deleteMember
+export async function comapanydetailAddEdit(form:any) {
+    try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.post( "companydetail/addedit",form , { 
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return null
+  }
+}
+
+//companydetail
+export async function companydetail( ) {
+   try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.post( "companydetail",{} , { 
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return null
+  }
+}
  
 
 export async function setCookie(name: string, value: any, days: number) {
