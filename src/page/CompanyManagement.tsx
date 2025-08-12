@@ -2,6 +2,7 @@ import  { useEffect, useState } from "react";
 import "./css/CompanyManagement.css"
 import Resizer from "react-image-file-resizer";
 import { comapanydetailAddEdit, companydetail } from "../action";
+const apiUrl = import.meta.env.VITE_API;
 
 
 const resizeFile = (file:any) =>
@@ -23,12 +24,15 @@ const CompanyManagement=()=>{
      // Section 1: CEO Information
   const [ceoName, setCeoName] = useState('');
   const [ceoNickName, setCeoNickName] = useState('');
-  const [ceoImage, setCeoImage] = useState<File | null>(null);
-  const [covermage, setCoverImage] = useState<File | null>(null);
+  const [ceoImage, setCeoImage] = useState<File | any>(null);
+  const [ceoImageView, setCeoImageView] = useState<File | any>(null);
+  const [covermage, setCoverImage] = useState<File | any>(null);
 
   // Section 2: Team Members Upload
   const [teamMembers, setTeamMembers] = useState<File[]>([]);
+  const [teamMembersView, setTeamMembersView] = useState<File | any>(null);
   const [managementTeam, setManagementTeam] = useState<File[]>([]);
+  const [managementTeamView, setManagementTeamView] = useState<File[]|any[]>([]);
 
   // Section 3: Slogan and Vision/History
   const [slogan, setSlogan] = useState('');
@@ -39,14 +43,36 @@ const CompanyManagement=()=>{
         const getcdetail=async ()=>{
             const res = await companydetail()
             console.log("companydetail res ",res)
+
+            setCeoName(res.ceoName)
+            setCeoNickName(res.ceoNickName)
+            setCeoImageView(apiUrl+"/api/file/drive-image/"+res.ceoImage)
+            let teamimg: any[] = []
+            await   Promise.all ( 
+            res?.teamMembers.map((img:any)=>{
+                teamimg = [...teamimg , apiUrl+"/api/file/drive-image/"+img]
+            }))
+            setTeamMembersView(teamimg)
+             let manageteam: any[] = []
+            await   Promise.all ( 
+            res?.managementTeam.map((img:any)=>{
+                manageteam = [...manageteam , apiUrl+"/api/file/drive-image/"+img]
+            }))
+            setManagementTeamView(manageteam)
+            setSlogan(res?.slogan)
+            setHistory(res?.history)
+            // setCeoImage([])
+            // setCoverImage([])
         }
         getcdetail()
     },[])
-    
+
   // Handle file input for CEO Image
   const handleCeoImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
+        console.log("e.target.files ",e.target.files)
       setCeoImage(e.target.files[0]);
+      setCeoImageView( URL.createObjectURL(e.target.files[0]))
     }
   };
    const handleCoverMessageImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,12 +85,14 @@ const CompanyManagement=()=>{
   const handleTeamMembersChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setTeamMembers([...teamMembers, ...Array.from(e.target.files)]);
+      setTeamMembersView([...teamMembersView, ...Array.from( e.target.files).map(file=>{ return URL.createObjectURL(file )}) ])
     }
   };
 
   const handleManagementTeamChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setManagementTeam([...managementTeam, ...Array.from(e.target.files)]);
+      setManagementTeamView([...managementTeam, ...Array.from( e.target.files).map(file=>{ return URL.createObjectURL(file )}) ])
     }
   };
 
@@ -106,7 +134,7 @@ const CompanyManagement=()=>{
         
       })
     ); 
-    const historystr:any = history.map(str=>{return str+","})
+    const historystr:any = history.map(str=>{return str+"#"})
     formData.append('slogan', slogan);
     formData.append('history',historystr); 
      if (covermage) formData.append('coverImages', covermage);
@@ -147,6 +175,9 @@ const CompanyManagement=()=>{
             />
             </div>
             </label>
+            <div>
+                <img src={ceoImageView} alt="" style={{width:"5rem"}} />
+            </div>
             <label>
             CEO Image (PNG):
              <div className="input"> 
@@ -158,6 +189,15 @@ const CompanyManagement=()=>{
         {/* Section 2: Team Members Upload */}
         <div>
             <h5>Section 2: Upload Team Members Images</h5>
+
+            <div>
+                {
+                    teamMembersView && teamMembersView.map((img:any, index:any)=>
+                        <img key={index} src={img} alt={img+index} style={{width:"5rem"}} />
+                    )
+                }
+            </div>
+           
             <label>
             Team Members (Multiple Files):
              <div className="input"> 
@@ -169,7 +209,13 @@ const CompanyManagement=()=>{
             />
             </div>
             </label>
-            <label>
+            <label> <div>
+                {
+                    managementTeamView && managementTeamView.map((img:any, index:any)=>
+                        <img key={index} src={img} alt={img+index} style={{width:"5rem"}} />
+                    )
+                }
+            </div>
             Management Team (Multiple Files):
              <div className="input"> 
             <input
