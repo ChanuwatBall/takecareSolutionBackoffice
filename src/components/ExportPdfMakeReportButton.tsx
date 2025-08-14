@@ -109,7 +109,7 @@ export default function ExportPdfMakeReportButton({
           { text: `หน้า ${currentPage}/${pageCount}`, alignment: "right", style: "muted" },
         ],
       }),
-      footer: (currentPage:any, pageCountv) => ({
+      footer: () => ({
         margin: [28, 0, 28, 12],
         columns: [
           { text: `พิมพ์เมื่อ ${moment().format("DD MMM YYYY HH:mm")}`, style: "muted" },
