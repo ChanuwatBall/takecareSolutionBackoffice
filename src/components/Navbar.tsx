@@ -1,7 +1,7 @@
 // src/components/Navbar.tsx
 import React, { useEffect, useRef, useState } from "react";
 import "./css/Navbar.css";
-import { deleteCookie, getCookie } from "../action";
+import { deleteCookie, getCookie, getDefaultCompay } from "../action";
 const apiUrl = import.meta.env.VITE_API;
 
 interface NavbarProps {
@@ -25,6 +25,15 @@ const Navbar: React.FC<NavbarProps> = ({ onToggle }) => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [profile , setProfile ] = useState<User|any>(null)
+  const [company,setCompany] = useState({
+    "id": 0,
+    "name": "",
+    "liffId": "",
+    "liffUrl": "",
+    "logo": "1X0TewqnVRYQxzyYePXcwHucbYv0WbCSV",
+    "company": null,
+    "district": null
+})
 
 
   const handleLogout = async() => {
@@ -45,6 +54,12 @@ const Navbar: React.FC<NavbarProps> = ({ onToggle }) => {
           setProfile(userinfo)
           console.log("userinfo ",userinfo)
     }
+    const getcompany=async ()=>{
+      const decom = await getDefaultCompay()
+      console.log("decom ",decom)
+      setCompany(decom)
+    }
+    getcompany()
     getProfile()
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -63,10 +78,8 @@ const Navbar: React.FC<NavbarProps> = ({ onToggle }) => {
       
       <div className="logo-center">
         <div className="inner  "  >  
-            <img src={apiUrl+"/api/file/drive-image/1X0TewqnVRYQxzyYePXcwHucbYv0WbCSV"}  alt="Logo" className="logo"  />
-        </div>
-
-        {/* <img src="https://drive.google.com/file/d/1V7cohT2pkNy1vwfROYU0qldmDqwv0KDW/preview" alt="Logo" className="logo" /> */}
+            <img src={apiUrl+"/api/file/drive-image/"+company?.logo}  alt="Logo" className="logo"  />
+        </div> 
       </div>
 
       <div className="profile-wrapper" ref={menuRef}>

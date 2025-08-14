@@ -11,9 +11,11 @@ import {
   Legend,
 } from 'chart.js'; 
 import ApexCharts from 'apexcharts';
-import moment from 'moment';
+// import moment from 'moment';
 import "./css/Dashboard.css"
 import { dashboardCoplaintSummary, dashboardMembers, dashboardMemberStats } from '../action';
+import ExportPdfMakeReportButton from '../components/ExportPdfMakeReportButton';
+import moment from 'moment/min/moment-with-locales';
 
 moment.locale('th')
 
@@ -37,6 +39,9 @@ const Dashboard = () => {
     const [members,setMember] = useState<any[]>([])
     const [search, setSearch] = useState("");
     const [membersCount,setMemberCount] = useState("0")
+    const [ piechartData , setPieChart] = useState<any>({data:[] , labels:[]})
+    const [lineChartUri ,setLineChartUri] = useState("")
+    const [pieChartUri ,setPieChartUri] = useState("")
    
 
     const [complaintSummary , setcomplaintSummary] = useState<any>({
@@ -54,13 +59,16 @@ const Dashboard = () => {
 
   useEffect(()=>{
     const membersRegiter=async ()=>{
+      setSelectedMonth(moment().format("YYYY-MM"))
       const memberStats = await dashboardMemberStats(selectedMonth) 
-      setMemberState(memberStats) 
-      console.log("linechart ",linechart)
+      setMemberState(memberStats)  
       linechart?.updateSeries([{
           name: "Member",
           data:  memberStats?.data
         }])
+      linechart?.dataURI().then(({imgURI}:any) => {  
+        setLineChartUri(imgURI)
+      });
 
       const cpsumm = await dashboardCoplaintSummary(selectedMonth)
       console.log("cpsumm ",cpsumm)
@@ -70,9 +78,11 @@ const Dashboard = () => {
       const inProcessPercen = (cpsumm?.inProgressInMonth / cpsumm?.total) * 100;
       const pendingPercen = (cpsumm?.pendingInMonth / cpsumm?.total) * 100; 
      
+      setPieChart({data: [donePercen ,inProcessPercen + pendingPercen ] , labels:[" ได้รับการแก้ไข" , "กำลังดำเนินการ"] })
       piechart?.updateSeries(
            [donePercen , inProcessPercen + pendingPercen],
-        )
+        ) 
+    
 
       const dashmember = await dashboardMembers();
       console.log("dashmember ",dashmember)
@@ -107,7 +117,10 @@ const Dashboard = () => {
      
       piechart?.updateSeries(
            [donePercen , inProcessPercen + pendingPercen],
-        )
+      )
+     piechart?.dataURI().then(({imgURI}:any) => {  
+            setPieChart(imgURI)
+     });
   }
  
   const filteredMembers = members.filter((m) =>
@@ -123,8 +136,17 @@ const Dashboard = () => {
         <input
           type="month"  className='input'
           value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
+          onChange={(e) =>{console.log("e.target.value ",e.target.value) ; setSelectedMonth(moment(e.target.value).format("YYYY-MM"))}}
         />
+        <ExportPdfMakeReportButton
+        month={selectedMonth}
+        memberStats={memberStats}
+        complaintSummary={complaintSummary}
+        membersCount={membersCount}
+        lineChartUri={lineChartUri}
+        pieChartUri={pieChartUri}
+        members={members}
+      />
       </div>
 
       <div className="card line-chart" id='card-line-chart'>  
@@ -143,6 +165,7 @@ const Dashboard = () => {
          chartRef={linechart}
          next={(chart:any)=>{changeMonth(chart,moment(selectedMonth).add(1,"month").format("YYYY-MM"));  }}
          prev={(chart:any)=>{changeMonth(chart,moment(selectedMonth).subtract(1,"month").format("YYYY-MM")); }}
+         setUri={(uri:any)=>{ setLineChartUri(uri)}}
         />
         {/* <Line data={memberStats} /> */}
       </div>
@@ -209,12 +232,11 @@ const Dashboard = () => {
          
           <div id="wrap-piechart" style={{width:"50%", height:"15rem"}} className='set-center' > 
              
-            <ComplaintPieChart data={{}} wrapid={"wrap-piechart"} /> 
-            {/* // <Pie data={complaintChartData}  options={{  plugins: {
-            //     legend: {
-            //         display: false, 
-            //     }
-            // }}} /> */}
+            <ComplaintPieChart 
+             data={piechartData} 
+             wrapid={"wrap-piechart"} 
+             setUri={(uri:any)=>{  setPieChartUri(uri)}} 
+            />  
              
           </div>
         </div>
@@ -278,13 +300,20 @@ const Dashboard = () => {
 export default Dashboard;
 
 
-const ComplaintPieChart =({data}:any)=>{
+const ComplaintPieChart =({data , setUri}:any)=>{
  
 
   let options = {
      chart: {
        height: 250,
        type: 'pie',
+       events: {
+        updated:(e:any)=>{ 
+           e?.dataURI().then(({imgURI}:any) => {  
+            setUri(imgURI)
+        });
+        }
+       }
      },
      series: data?.data  ,
      labels: data?.labels ,
@@ -319,7 +348,11 @@ const ComplaintPieChart =({data}:any)=>{
 
       if( chartcontetnt?.innerHTML.length < 20){
         piechart = new ApexCharts(chartcontetnt, options); 
-        piechart.render(); 
+        piechart.render();  
+        piechart.dataURI().then(({imgURI}:any) => { 
+            // console.log(imgURI);
+            setUri(imgURI)
+        });
         // piechart.updateOptions(options)
       }else{  
       } 
@@ -335,7 +368,7 @@ const ComplaintPieChart =({data}:any)=>{
 }
  
 var chart: ApexCharts | null = null
-const MemberRegisterLineChart=({wrapid , data , setLine ,selectedMonth , next , prev }:any)=>{
+const MemberRegisterLineChart=({wrapid , data , setLine ,selectedMonth , next , prev ,setUri}:any)=>{
 
   var options:any = {
     chart: {
@@ -348,7 +381,7 @@ const MemberRegisterLineChart=({wrapid , data , setLine ,selectedMonth , next , 
     toolbar:{ show:false }, 
     xaxis: { type: 'datetime', categories:  data?.labels,
             labels: {  formatter: function (value:any) {  
-               return  moment(value).lang("th").format("DD MMM") 
+               return  moment(value).format("DD MMM") 
             } },
         },
     stroke: {
@@ -393,7 +426,7 @@ const MemberRegisterLineChart=({wrapid , data , setLine ,selectedMonth , next , 
       const startOfMonth = moment().startOf('month').format();
        Array.from(Array(30-labels.length)).map((label,index)=>{
         console.log("label ",label)
-          labels = [...labels , moment(startOfMonth).add(index,'days').subtract(1,"month").format("YYYY-MM-DD")  ]
+          labels = [...labels , moment(startOfMonth).add(index,'days').subtract(1,"month").locale("th").format("YYYY-MM-DD")  ]
        }
       );
       console.log("labels ",labels)
@@ -414,7 +447,9 @@ const MemberRegisterLineChart=({wrapid , data , setLine ,selectedMonth , next , 
       if( chartcontetnt?.innerHTML.length < 20){
         chart = new ApexCharts(chartcontetnt, options); 
         chart.render();
-       
+        chart.dataURI().then(({imgURI}:any) => {  
+            setUri(imgURI)
+        });
         return  setLine(chart)
       }else{ 
         // chart?.updateSeries([{

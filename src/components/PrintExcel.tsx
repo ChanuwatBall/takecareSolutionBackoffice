@@ -37,7 +37,8 @@ export const PrintExcel = ({jsonData,sheetname,filename}:PrintExcelProps) => {
             width:"fit-content" ,
             padding:".5rem",
             background:"#FFF",
-            fontSize:"small"
+            fontSize:"small",
+            color:"black"
         }} 
          onClick={exportToExcel}> 
          {loading && <div className="spinner"></div>} &nbsp;
@@ -122,7 +123,8 @@ export const PrintExcelActivity = ({jsonData}:any ) => {
             width:"fit-content" ,
             padding:".5rem",
             background:"#FFF",
-            fontSize:"small"
+            fontSize:"small",
+            color:"black"
         }} 
          onClick={exportToExcel}>  
              {loading ? "กำลังสร้างไฟล์"  :"ส่งออกเป็นไฟล์" }    &nbsp;
@@ -212,7 +214,8 @@ export const PrintExcelComplaint= ({jsonData}:any ) => {
             width:"fit-content" ,
             padding:".5rem",
             background:"#FFF",
-            fontSize:"small"
+            fontSize:"small",
+            color:"black"
         }} 
          onClick={exportToExcel}>  
              {loading ? "กำลังสร้างไฟล์"  :"ส่งออกเป็นไฟล์" }    &nbsp;

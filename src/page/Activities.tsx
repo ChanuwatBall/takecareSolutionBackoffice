@@ -63,7 +63,7 @@ const Activities=()=>{
               return (
                 <tr key={item.id}>
                   <td>{String(index + 1).padStart(3, '0')}</td>
-                  <td> <button className="link-btn" onClick={() => setSelected(item)}> 
+                  <td> <button className="link-btn" style={{color:"black" , background:"none", padding:"0px", fontWeight:"400"}} onClick={() => setSelected(item)}> 
                     {item.name}
                     </button>
                   </td>

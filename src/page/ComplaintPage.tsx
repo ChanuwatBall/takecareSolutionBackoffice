@@ -79,7 +79,7 @@ const ComplaintPage: React.FC = () => {
             background: "#fff",
             borderRadius: "20px",
             padding: "2rem",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
           }}
         >
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -256,6 +256,7 @@ const navBtnStyle: React.CSSProperties = {
   width: "36px",
   height: "36px",
   cursor: "pointer",
+  color:"black"
 };
 
 

@@ -17,6 +17,9 @@
   border-radius: 10px;
 }
 
+input.input[type="month"]{
+  max-width: 10rem;
+}
 .card {
   background: #fff;
   border-radius: 15px;
