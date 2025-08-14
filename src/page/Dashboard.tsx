@@ -373,6 +373,13 @@ const MemberRegisterLineChart=({wrapid , data , setLine ,selectedMonth , next , 
   var options:any = {
     chart: {
       type: 'line' , 
+       events: {
+        updated:(e:any)=>{ 
+           e?.dataURI().then(({imgURI}:any) => {  
+            setUri(imgURI)
+        });
+        }
+       }
     },
     series: [{
       name: 'sales',
