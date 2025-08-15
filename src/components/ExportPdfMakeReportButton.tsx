@@ -2,6 +2,7 @@
 import moment from "moment"; 
 import pdfMake  from "../utils/pdfmake" // ใช้ตัวที่ตั้งฟอนต์ไว้
 import type { TDocumentDefinitions } from "pdfmake/interfaces";
+import { getCookie } from "../action";
 
 moment.locale("th");
 
@@ -60,9 +61,11 @@ export default function ExportPdfMakeReportButton({
   pieChartUri: string;
   members: MemberRow[];
 }) {
-  const handleExport = () => {
+  const handleExport = async () => {
     const mLabel = moment(month).format("MMMM YYYY");
     const k = buildKpis(complaintSummary);
+    const user = await getCookie("user_info")
+    console.log("user ",user)
 
     const membersTableBody = [
       [
@@ -88,7 +91,7 @@ export default function ExportPdfMakeReportButton({
     const docDefinition: TDocumentDefinitions = {
       info: {
         title: `รายงานประจำเดือน ${mLabel}`,
-        author: "Andaman Tracking",
+        author: user?.name,
       },
       pageMargins: [28, 40, 28, 40],
       defaultStyle: {
@@ -113,7 +116,7 @@ export default function ExportPdfMakeReportButton({
         margin: [28, 0, 28, 12],
         columns: [
           { text: `พิมพ์เมื่อ ${moment().format("DD MMM YYYY HH:mm")}`, style: "muted" },
-          { text: "Andaman Tracking", alignment: "right", style: "muted" },
+          { text: "ออกรายงานโดย "+ user?.name , alignment: "right", style: "muted" },
         ],
       }),
       content: [
@@ -190,7 +193,9 @@ export default function ExportPdfMakeReportButton({
             body: membersTableBody,
           },
           layout: "lightHorizontalLines",
-        },
+        }, 
+        { text:"" } ,
+        // { text: ["ออกรายงานโดย ", user?.name] , bold: true, margin: [20, 0, 0, 4] ,  alignment: 'right'  },
       ],
     };
 
