@@ -186,7 +186,7 @@ const MemberSettings = () => {
         <div  style={{ display:"flex", justifyContent: "space-between" ,alignItems:"flex-start"}} >
           <UploadOfficerModal uploadHandler={(data:any)=>{uploadofficer(data)}} /> &nbsp;
           <div className="dropdown">
-            <button className="btn" onClick={()=>{setFilter(prev => prev = !prev)}}>กรอง ▾</button>
+            <button className="btn text-black" onClick={()=>{setFilter(prev => prev = !prev)}}>กรอง ▾</button>
             { filter && <div className="dropdown-content">
               {columns.map((col) => (
                 <div key={col.key} className='text-left'

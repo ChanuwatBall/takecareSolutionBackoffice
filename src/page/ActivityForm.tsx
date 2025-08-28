@@ -39,6 +39,7 @@ export default function ActivityForm() {
   const [termsCondition , setTermsCondition] = useState("")
   const [showAlert] = useAlert();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [loading , setLoading] = useState(false)
   
 
 //   const [imgs, setImages] = useState([]/)
@@ -93,8 +94,7 @@ useEffect(()=>{
   };
 
   const savePublish=async()=>{ 
-
-
+    setLoading(true)
     const formData = new FormData();
     
     await  images.forEach(async (img ) => {  
@@ -123,6 +123,7 @@ useEffect(()=>{
      }else{
       showAlert('เพิ่มกิจกรรมไม่สำเร็จ',"error")
      }
+    setLoading(false)
   }
 
   return ( 
@@ -220,12 +221,13 @@ useEffect(()=>{
         </div>
 
         <div className="form-actions">
-            <button type="submit" className="btn btn-primary"
+            <button type="submit" className="btn btn-outline"
               onClick={()=>{savePublish()}}
             >บันทึก</button>
             <button type="button" className="btn btn-outline">บันทึกแบบร่าง</button>
+            {loading && <div className="spinner"></div>} &nbsp;
         </div>
-        </div>
+        </div> <br/><br/><br/><br/>
 
     </div>
     </div>

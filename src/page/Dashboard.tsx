@@ -293,7 +293,7 @@ const Dashboard = () => {
           </tbody>
         </table>
       </div>
-    </div>
+    </div><br/><br/><br/>
     </div>
   ); 
 }

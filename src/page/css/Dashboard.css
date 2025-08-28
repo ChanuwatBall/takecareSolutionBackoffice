@@ -19,6 +19,8 @@
 
 input.input[type="month"]{
   max-width: 10rem;
+  background: #FFF;
+  color: black;
 }
 .card {
   background: #fff;

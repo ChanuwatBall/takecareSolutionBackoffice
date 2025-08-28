@@ -28,15 +28,7 @@ const UploadOfficerModal = ({uploadHandler}:any) => {
   const handleSubmit = async() => {
     setOpen(false)
     uploadHandler(officers)
-    console.log('Saving officers...', officers);
-    // let update = officers.map((e)=>{ return {...e ,...{allowedTopicIds: e.allowedTopicIds.split(",") }}  })
-    // console.log('update...', update);
-    // const result = await uploadMember(update)
-    //  if(result?.result){ 
-    //   showAlert('เพิ่มเจ้าหน้าที่สำเร็จ', 'success')
-    //  }else{
-    //   showAlert('เพิ่มเจ้าหน้าที่ไม่สำเร็จ',"error")
-    //  }
+    console.log('Saving officers...', officers); 
   };
     const handleDrop = (e: DragEvent<HTMLDivElement>) => {
       e.preventDefault();
@@ -71,7 +63,7 @@ const UploadOfficerModal = ({uploadHandler}:any) => {
 
   return (
     <div className='upload-officer'>  
-     <button className="btn" onClick={()=>{setOpen(true)}} >  อัปโหลดข้อมูล </button>
+     <button className="btn text-black" onClick={()=>{setOpen(true)}} >  อัปโหลดข้อมูล </button>
     {/* <button></button> */}
    {open && <div className="modal">
     <div className="modal-content" style={{width:"70vw"}}>

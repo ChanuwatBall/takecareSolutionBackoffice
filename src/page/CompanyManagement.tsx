@@ -150,7 +150,7 @@ const CompanyManagement=()=>{
      <div className="moo-page" >
        <div style={{ background: "#f2f2f2", padding: "2rem", minHeight: "100vh" }}>
 
-         <form onSubmit={handleSubmit} className="text-left">
+         <form onSubmit={handleSubmit} className="text-left company-manage">
         {/* Section 1: CEO Information */}
         <div>
             <h5>Section 1: About CEO</h5>

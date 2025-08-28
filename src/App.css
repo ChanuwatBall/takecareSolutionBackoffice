@@ -49,7 +49,7 @@ b , strong , h1 ,h2,h3,h4,h5,h6{
 button.clear{
   background-color: transparent;
 }
-
+input,select,textarea{ background: #FFF; }
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
@@ -68,7 +68,7 @@ button.clear{
 .card {
   padding: 2em;
 }
-
+.text-black{color: black ;}
 .read-the-docs {
   color: #888;
 }
@@ -109,4 +109,8 @@ thead , th{
 }
 .no-marin{
   margin: none !important;
+}
+
+::-webkit-scrollbar {
+  background: #FFF;
 }

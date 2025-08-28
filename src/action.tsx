@@ -318,6 +318,26 @@ export async function getActivities() {
     return null
   }
 }
+
+///activity/delete
+export async function deleteActivity(body:any) {
+    try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.post( "activity/delete" ,body, { 
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return null
+  }
+}
+
+
 export async function updateActivityStatus(body:any) {
     try {
     const token = await getCookie("auth_token")

@@ -29,9 +29,9 @@ label {
   font-weight: bold;
 }
 
-input[type="text"],
-input[type="file"],
-textarea {
+.company-manage input[type="text"],
+.company-manage input[type="file"],
+.company-manage textarea {
   width: 100%;
   padding: 8px;
   margin-bottom: 10px;

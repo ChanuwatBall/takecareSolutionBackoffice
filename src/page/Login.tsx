@@ -20,7 +20,7 @@ const Login=()=>{
             console.log("login result ",result)
 
 
-            if(result){ 
+            if(result && result?.token){ 
                 // ✅ เก็บ token ใน cookie 1 วัน
                 localStorage.setItem("token", result.token)
                 setCookie('auth_token', result.token,  1 );
@@ -80,7 +80,7 @@ const Login=()=>{
             onChange={(e) => setUsername(e.target.value)}
             required
             />
-        </div>
+        </div> 
         <div className="input"> 
             <input
                 type={passtype}
@@ -89,7 +89,7 @@ const Login=()=>{
                 onChange={(e) => setPassword(e.target.value)}
                 required
             />
-            <div className="button clear" onClick={()=>{viewPassword()}} >  
+            <div className="button clear" onClick={()=>{viewPassword()}} style={{height:"2.7em"}} >  
                 <img src={ passtype.match("password") ? "icons/ionicons/eye-outline.svg" : "icons/ionicons/eye-off-outline.svg"} style={{width:"1rem"}} />
             </div>
         </div>
