@@ -30,6 +30,7 @@ export const getDefaultCompay=async()=>{
     })
 }
 
+
 export async function login ({  username ,  password , company }:any){
   try {
     const token = encodeBase64(username +":"+  password)
@@ -79,6 +80,23 @@ export async function getMemberdetail() {
     console.error('POST failed:', error.message);
     return null
   }
+}
+
+
+export const companymember=async()=>{  
+    const token = await getCookie("auth_token") 
+    console.log("token ",token)
+    return await api.post("companymember",{}, { 
+      headers: { 
+        token: "Basic "+token
+      }
+    }).then((res)=>{
+        console.log("companymember res ",res)
+        return res.data
+    }).catch((err)=>{
+        console.log("companymember err ",err)
+        return []
+    })
 }
 
 export async function getMembers() {
@@ -176,6 +194,23 @@ export async function complaintslist(topic:any) {
       params:{  
         topic: topic
       },
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return {result: false , description: error?.message}
+  }
+}
+
+export async function lastcomplaint() {
+ try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.post( "lastcomplaint" , {} , { 
       headers: { 
         token: "Basic "+token
       }

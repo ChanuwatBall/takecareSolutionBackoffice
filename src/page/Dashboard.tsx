@@ -78,7 +78,7 @@ const Dashboard = () => {
       const inProcessPercen = (cpsumm?.inProgressInMonth / cpsumm?.total) * 100;
       const pendingPercen = (cpsumm?.pendingInMonth / cpsumm?.total) * 100; 
      
-      setPieChart({data: [donePercen ,inProcessPercen + pendingPercen ] , labels:[" ได้รับการแก้ไข" , "กำลังดำเนินการ"] })
+      setPieChart({data: [donePercen ,inProcessPercen + pendingPercen ] , labels:[" ได้รับการแก้ไข" , "กำลังดำเนินการ"] ,cpsumm:cpsumm })
       piechart?.updateSeries(
            [donePercen , inProcessPercen + pendingPercen],
         ) 
@@ -146,6 +146,7 @@ const Dashboard = () => {
         lineChartUri={lineChartUri}
         pieChartUri={pieChartUri}
         members={members}
+        piechartData={piechartData}
       />
       </div>
 
