@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { decodeBase64, getVillagersByVillage, updateVillager } from "../action";
 import './css/Villager.css';
 import { useAlert } from "../components/AlertContext";
 import { PrintExcel } from "../components/PrintExcel";
-
 
 interface Villager {
   id: number
@@ -26,7 +25,6 @@ interface Villager {
   email: string
 }
 
-
 const MooID: React.FC = () => {
   const { id } = useParams<{ id: any }>();
   const [members, setMembers] = useState<Villager[]>([]);
@@ -34,59 +32,103 @@ const MooID: React.FC = () => {
   const [village, setVillage] = useState<any>(null);
   const [showAlert] = useAlert();
 
+  // --- Pagination state (NEW) ---
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+
+  const pgClamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
+  const goToPage = (p: number, totalPages: number) => setPage(pgClamp(p, 1, totalPages));
 
   const getVillager = async () => {
-    console.log("village change ")
-    const villageid = decodeBase64(id)
-    const villager = await getVillagersByVillage({ id: villageid })
-    console.log("villager ", villager)
-    setMembers(villager?.villager)
-    setVillage(villager?.village)
-  }
+    const villageid = decodeBase64(id);
+    const villager = await getVillagersByVillage({ id: villageid });
+    setMembers(villager?.villager || []);
+    setVillage(villager?.village || null);
+  };
 
   useEffect(() => {
-    getVillager()
-  }, [window.location.pathname]);
+    getVillager();
+    // เดิมใช้ window.location.pathname ใน deps ซึ่งไม่เหมาะ — ใช้ id พอ
+  }, [id]);
 
   const update = async (data: any) => {
-
-    console.log("update ", data)
-    const result: any = await updateVillager(data)
+    const result: any = await updateVillager(data);
     if (result?.result) {
-      showAlert(`อัปเดตสมาชิก ${data?.firstName} ${data?.lastName} สำเร็จ`, 'success')
-      getVillager()
+      showAlert(`อัปเดตสมาชิก ${data?.firstName} ${data?.lastName} สำเร็จ`, 'success');
+      getVillager();
     } else {
-      showAlert(`อัปเดตสมาชิก ${data?.firstName} ${data?.lineName} ไม่สำเร็จ`, "error")
+      showAlert(`อัปเดตสมาชิก ${data?.firstName} ${data?.lineName} ไม่สำเร็จ`, "error");
     }
+  };
 
-  }
+  // --- Search + memo (UPDATED) ---
+  const filteredMembers = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return members;
+    return members.filter((m) =>
+      `${m.firstName} ${m.lastName} ${m.phoneNumber} ${m.lineName}`.toLowerCase().includes(q)
+    );
+  }, [members, search]);
 
-  const filteredMembers = members.filter((m) =>
-    `${m.firstName} ${m.lastName} ${m.phoneNumber}`.toLowerCase().includes(search.toLowerCase())
-  );
+  // --- Pagination calculations (NEW) ---
+  const total = filteredMembers.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  useEffect(() => { setPage((p) => pgClamp(p, 1, totalPages)); }, [totalPages, pageSize, filteredMembers]);
+  useEffect(() => { setPage(1); }, [search]);
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, total);
+  const pageItems = filteredMembers.slice(startIndex, endIndex);
 
   const calculateAge = (birthdate: string) => {
     const dob = new Date(birthdate);
     const now = new Date();
-    return now.getFullYear() - dob.getFullYear();
+    let age = now.getFullYear() - dob.getFullYear();
+    const mdiff = now.getMonth() - dob.getMonth();
+    if (mdiff < 0 || (mdiff === 0 && now.getDate() < dob.getDate())) age -= 1;
+    return age;
   };
 
   const genderText = (g: string) => g === 'MALE' ? 'ชาย' : g === 'FEMALE' ? 'หญิง' : 'ไม่ระบุ';
+
+  // --- Pagination UI (NEW) ---
+  const pgBtn = (disabled: boolean): React.CSSProperties => ({
+    padding: "0.35rem 0.6rem",
+    borderRadius: 8,
+    border: "1px solid #ddd",
+    background: disabled ? "#f5f5f5" : "#fff",
+    color: disabled ? "#aaa" : "#333",
+    cursor: disabled ? "not-allowed" : "pointer"
+  });
+  const PaginationBar = () => (
+    <div style={{display:"flex", gap:"1rem", alignItems:"center", justifyContent:"space-between", margin:"0.75rem 0", fontSize:"small"}}>
+      <div style={{ color:"#555", fontSize:14 }}>
+        แสดง {total === 0 ? 0 : startIndex + 1}-{endIndex} จาก {total} รายการ
+      </div>
+      <div style={{display:"flex", gap:"0.5rem", alignItems:"center"}}>
+        <label style={{ color:"#555", fontSize:14 }}>ต่อหน้า:</label>
+        <select
+          value={pageSize}
+          onChange={(e)=> setPageSize(parseInt(e.target.value,10))}
+          style={{ padding:"0.3rem 0.5rem", borderRadius:8, border:"1px solid #ddd", background:"#fff" }}
+        >
+          {[5,10,20,50].map(n=> <option key={n} value={n}>{n}</option>)}
+        </select>
+        <div style={{display:"flex", gap:6, alignItems:"center"}}>
+          <button onClick={()=>goToPage(1, totalPages)} disabled={page===1} style={pgBtn(page===1)}>« หน้าแรก</button>
+          <button onClick={()=>goToPage(page-1, totalPages)} disabled={page===1} style={pgBtn(page===1)}>‹ ก่อนหน้า</button>
+          <span style={{ color:"#555", minWidth:90, textAlign:"center" }}>หน้า {page}/{totalPages}</span>
+          <button onClick={()=>goToPage(page+1, totalPages)} disabled={page===totalPages} style={pgBtn(page===totalPages)}>ถัดไป ›</button>
+          <button onClick={()=>goToPage(totalPages, totalPages)} disabled={page===totalPages} style={pgBtn(page===totalPages)}>สุดท้าย »</button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="moo-page" >
       <div style={{ background: "#f2f2f2", padding: "2rem", minHeight: "100vh" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div className="set-center" style={{ flexDirection: "row", justifyContent: "flex-end", marginBottom: "2rem" }} >
-            {/* <button style={{
-                        width:"fit-content" ,
-                        padding:".5rem",
-                        background:"#FFF",
-                        fontSize:"small"
-                    }} > 
-                        ส่งออกเป็นไฟล์  &nbsp;
-                        <img src="../icons/ionicons/chevron-down-outline.svg" style={{width:".8rem"}} /> 
-                    </button> */}
             <PrintExcel
               jsonData={members}
               sheetname={"Members"}
@@ -114,13 +156,14 @@ const MooID: React.FC = () => {
               {members.length.toLocaleString()}
             </h1>
           </div>
+
           {/* ช่องค้นหา */}
           <div
             style={{
               background: "#fff",
               padding: "1.25rem 1.5rem",
               borderRadius: "16px",
-              marginBottom: "1.5rem",
+              marginBottom: "0.5rem",
               display: "flex",
               alignItems: "center",
               boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
@@ -143,86 +186,95 @@ const MooID: React.FC = () => {
             <span style={{ fontSize: "1.5rem", color: "#aaa" }}>
               <img src="../icons/ionicons/search-outline.svg" style={{ width: "1.5rem" }} />
             </span>
-          </div>
+          </div><br/>
+
+          {/* TOP pagination (NEW) */}
+          <PaginationBar />
 
           {/* ตารางสมาชิก */}
           <div
             style={{
               background: "#fff",
-              borderRadius: "16px",
+              // borderRadius: "16px",
               padding: "1.5rem",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.05)", borderRadius: "16px",
               overflowX: "auto",
               minHeight: "15rem"
             }}
           >
             <table style={{
-              width: "100%", borderCollapse: "collapse", fontSize: ".8em",
-              paddingBottom: "5rem"
+              width: "100%", borderCollapse: "collapse", fontSize: ".8em", borderRadius: "16px",
+              paddingBottom: "5rem" 
             }}>
               <thead style={{ color: "#555", fontWeight: 500, borderBottom: "1px solid #E0E0E0" }}>
                 <tr>
                   <th style={thStyle} >ชื่อไลน์</th>
                   <th style={thStyle} > หมายเลขโทรศัพท์ </th>
-
                   <th style={thStyle} >ชื่อ-นามสกุล</th>
                   <th style={thStyle} >วันเกิด</th>
                   <th style={thStyle} >อายุ</th>
                   <th style={thStyle} >อีเมลล์</th>
                   <th style={thStyle} >เพศ</th>
-                  <th style={{
-                    ...thStyle, ...{
-                      boxShadow: "-18px -5px 15px -22px rgba(0,0,0,0.1)",
-                    }
-                  }}> </th>
+                  <th style={{ ...thStyle, ...{ boxShadow: "-18px -5px 15px -22px rgba(0,0,0,0.1)" }}} />
                 </tr>
               </thead>
               <tbody>
-                {filteredMembers.map((v, index) => (
-                  <tr key={v.id}>
-                    <td style={tdStyle}>{v.lineName}</td>
-                    <td style={tdStyle}>{v.phoneNumber}</td>
-                    <td style={tdStyle}>{v.firstName} {v.lastName}</td>
-                    <td style={tdStyle}>{v.birthDate}</td>
-                    <td style={tdStyle}>{calculateAge(v.birthDate)}</td>
-                    <td style={tdStyle}>{v.email}</td>
-                    <td style={tdStyle}>{genderText(v.gender)}</td>
-                    <th style={{
-                      ...tdStyle, ...{
-                        boxShadow: " -18px -5px 15px -22px rgba(0,0,0,0.3)",
-                        width: "10%", position: "relative"
-                      }
-                    }}>
-                      <div className="set-center" style={{ left: 0, top: 0, width: "90%", height: "100%", zIndex: 5, position: "absolute" }} >
-                        <ButtonEditMemberDialog
-                          villager={v}
-                          onSave={(data: any) => {
-                            console.log("update villager ", data);
-                            update(data)
-                          }}
-                        />
-                      </div>
-
-                      {index == 0 && <div style={{
-                        width: "100%", height: (filteredMembers.length + 1) + "00%", position: "absolute", top: "0", zIndex: 0, left: 0,
-                        boxShadow: "-18px -5px 15px -22px rgba(0,0,0,0.1)", background: "#FFF",
-                      }} >
-                      </div>}
-                    </th>
+                {pageItems.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} style={{ ...tdStyle, textAlign:"center", color:"#777" }}>
+                      ไม่พบรายการ
+                    </td>
                   </tr>
-                ))}
+                ) : (
+                  pageItems.map((v, index) => (
+                    <tr key={v.id}>
+                      <td style={tdStyle}>{v.lineName}</td>
+                      <td style={tdStyle}>{v.phoneNumber}</td>
+                      <td style={tdStyle}>{v.firstName} {v.lastName}</td>
+                      <td style={tdStyle}>{v.birthDate}</td>
+                      <td style={tdStyle}>{calculateAge(v.birthDate)}</td>
+                      <td style={tdStyle}>{v.email}</td>
+                      <td style={tdStyle}>{genderText(v.gender)}</td>
+                      <th style={{
+                        ...tdStyle, ...{
+                          boxShadow: " -18px -5px 15px -22px rgba(0,0,0,0.3)",
+                          width: "10%", position: "relative"
+                        }
+                      }}>
+                        <div className="set-center" style={{ left: 0, top: 0, width: "90%", height: "100%", zIndex: 5, position: "absolute" }} >
+                          <ButtonEditMemberDialog
+                            villager={v}
+                            onSave={(data: any) => update(data)}
+                          />
+                        </div>
+
+                        {index === 0 && (
+                          <div style={{
+                            width: "100%",
+                            height: (pageItems.length + 1) + "00%",
+                            position: "absolute",
+                            top: "0",
+                            zIndex: 0,
+                            left: 0,
+                            boxShadow: "-18px -5px 15px -22px rgba(0,0,0,0.1)",
+                            background: "#FFF",
+                          }}
+                          />
+                        )}
+                      </th>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
-
-
           </div>
-        </div>
+ 
+        </div><br/><br/><br/><br/><br/>
       </div>
     </div>
   )
-}
+};
 export default MooID;
-
 
 const thStyle: React.CSSProperties = {
   textAlign: "left",
@@ -239,14 +291,9 @@ const tdStyle: React.CSSProperties = {
   borderBottom: "none"
 };
 
-
-
-
-
 const ButtonEditMemberDialog = ({ villager, onSave }: any) => {
   const [open, setOpen] = useState(false)
   const [villId, setVillId] = useState(0)
-  // const [formData, setFormData] = useState<any>(data);
   const [firstName, setFistName] = useState("")
   const [email, setEmail] = useState("")
   const [lastName, setLastName] = useState("")
@@ -263,9 +310,8 @@ const ButtonEditMemberDialog = ({ villager, onSave }: any) => {
   const assigntoform = (data: any) => {
     setVillId(data?.id)
     setFistName(data?.firstName)
-    setEmail(data?.email ? data?.email : "")
+    setEmail(data?.email ?? "")
     setLineName(data?.lineName)
-
     setLastName(data?.lastName)
     serPhone(data?.phoneNumber)
     setVillageName(data?.villageName)
@@ -278,119 +324,103 @@ const ButtonEditMemberDialog = ({ villager, onSave }: any) => {
 
   const handleSave = (e: any) => {
     e.preventDefault();
-    const isValidEmail = (email: string) => {
-      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return regex.test(email);
-    };
+    const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     if (!isValidEmail(email)) {
       showAlert(`กรุณาระบุอีเมลล์ให้ถูกต้อง`, "warning")
-
       return null
     }
-
     const data = {
       id: villId,
       firstName,
       email,
       lastName,
       phoneNumber: phone,
-      villageName: villageName,
-      villageId: villageId,
+      villageName,
+      villageId,
       subdistrictName: subdistrict,
       birthDate,
       address: adress,
       gender,
-      lineName: lineName
+      lineName
     }
-    console.log("data ", data)
     onSave(data);
     setOpen(false)
   };
 
-  useEffect(() => {
+  useEffect(() => {}, [])
 
-  }, [])
+  return (
+    <>
+      <button
+        onClick={() => { assigntoform(villager); setOpen(true) }}
+        className="set-center"
+        style={{
+          flexDirection: "row",
+          border: "none",
+          background: "none",
+          color: "#848387",
+          cursor: "pointer",
+          padding: "3px",
+          fontSize: ".8em"
+        }}
+      >
+        <img src="../icons/ionicons/eye-outline.svg" style={{ width: ".8rem", marginRight: ".5rem" }} />
+        <label><small>ดู & แก้ไข</small></label>
+      </button>
 
-
-  return (<>
-    <button
-      onClick={() => {
-        assigntoform(villager);
-        setOpen(true)
-      }}
-      className="set-center"
-      style={{
-        flexDirection: "row",
-        border: "none",
-        background: "none",
-        color: "#848387",
-        cursor: "pointer",
-        padding: "3px",
-        fontSize: ".8em"
-      }}
-    >
-      <img src="../icons/ionicons/eye-outline.svg" style={{ width: ".8rem", marginRight: ".5rem" }} />
-      <label>
-        <small>ดู & แก้ไข</small>
-      </label>
-    </button>
-
-    {open && <div className="modal" style={{ zIndex: 999, top: 0, }}>
-      <div className="modal-content" style={{ width: "80vw", minHeight: "20rem", maxHeight: "90vh", overflowY: "scroll" }}>
-
-        <label className="text-left">ดู / แก้ไขสมาชิก</label><br />
-        <form onSubmit={(e) => handleSave(e)} >
-          <div style={{ width: "100%", display: "flex", flexDirection: "row" }}  >
-            <div style={{ width: "50%" }} >
-              <label className="text-left">ชื่อ <br />
-                <input className="input" name="firstName" value={firstName} onChange={(e) => { setFistName(e?.target.value) }} />
-              </label>
-              <label className="text-left" > นามสกุล<br />
-                <input className="input" name="lastName" value={lastName} onChange={(e) => { setLastName(e?.target.value) }} />
-              </label>
-              <label className="text-left" > เพศ <br />
-                <select className="input" name="gender" value={gender} onChange={(e) => { setFistName(e?.target.value) }}  >
-                  <option value="MALE">ชาย</option>
-                  <option value="FEMALE">หญิง</option>
-                </select>
-              </label>
-              <label className="text-left" > วันเกิด<br />
-                <input className="input" type="date" name="birthDate" value={birthDate} onChange={(e) => { setBirthdate(e?.target.value) }} />
-              </label>
-              <label className="text-left" > ที่อยู่ <br />
-                <textarea className="input" name="address" value={adress} onChange={(e) => { setAddress(e?.target.value) }} />
-              </label>
-            </div>
-            <div style={{ width: "50%", }} >
-              <label className="text-left" > ชื่อไลน์ <br />
-                <input className="input" name="linename" value={lineName} onChange={(e) => { setLineName(e?.target.value) }} />
-              </label>
-              <label className="text-left" > เบอร์โทร <br />
-                <input className="input" name="phoneNumber" maxLength={10} value={phone} onChange={(e) => { serPhone(e?.target.value) }} />
-              </label>
-              <label className="text-left" > อีเมล <br />
-                <input className="input" name="email"
-                  placeholder="example@example.com"
-                  value={email}
-                  onChange={(e) => { setEmail(e?.target.value); }}
-                />
-              </label>
-              <label className="text-left" > หมู่บ้าน<br />
-                <input className="input" disabled value={villageName} onChange={(e) => { setVillageName(e?.target.value) }} />
-              </label>
-              <label className="text-left" > ตำบล<br />
-                <input className="input" disabled value={subdistrict} onChange={(e) => { setSubdistrictName(e?.target.value) }} />
-              </label>
-            </div>
+      {open && (
+        <div className="modal" style={{ zIndex: 999, top: 0 }}>
+          <div className="modal-content" style={{ width: "80vw", minHeight: "20rem", maxHeight: "90vh", overflowY: "scroll"  }}>
+            <label className="text-left">ดู / แก้ไขสมาชิก</label><br />
+            <form onSubmit={(e) => handleSave(e)} >
+              <div style={{ width: "100%", display: "flex", flexDirection: "row" }}  >
+                <div style={{ width: "50%" }} >
+                  <label className="text-left">ชื่อ <br />
+                    <input className="input" name="firstName" value={firstName} onChange={(e) => { setFistName(e?.target.value) }} />
+                  </label>
+                  <label className="text-left" > นามสกุล<br />
+                    <input className="input" name="lastName" value={lastName} onChange={(e) => { setLastName(e?.target.value) }} />
+                  </label>
+                  <label className="text-left" > เพศ <br />
+                    {/* FIX: เดิม onChange เซ็ตชื่อ → เปลี่ยนเป็น setGender */}
+                    <select className="input" name="gender" value={gender} onChange={(e) => { setGender(e?.target.value) }}  >
+                      <option value="MALE">ชาย</option>
+                      <option value="FEMALE">หญิง</option>
+                    </select>
+                  </label>
+                  <label className="text-left" > วันเกิด<br />
+                    <input className="input" type="date" name="birthDate" value={birthDate} onChange={(e) => { setBirthdate(e?.target.value) }} />
+                  </label>
+                  <label className="text-left" > ที่อยู่ <br />
+                    <textarea className="input" name="address" value={adress} onChange={(e) => { setAddress(e?.target.value) }} />
+                  </label>
+                </div>
+                <div style={{ width: "50%" }} >
+                  <label className="text-left" > ชื่อไลน์ <br />
+                    <input className="input" name="linename" value={lineName} onChange={(e) => { setLineName(e?.target.value) }} />
+                  </label>
+                  <label className="text-left" > เบอร์โทร <br />
+                    <input className="input" name="phoneNumber" maxLength={10} value={phone} onChange={(e) => { serPhone(e?.target.value) }} />
+                  </label>
+                  <label className="text-left" > อีเมล <br />
+                    <input className="input" name="email" placeholder="example@example.com" value={email} onChange={(e) => { setEmail(e?.target.value) }} />
+                  </label>
+                  <label className="text-left" > หมู่บ้าน<br />
+                    <input className="input" disabled value={villageName} onChange={(e) => { setVillageName(e?.target.value) }} />
+                  </label>
+                  <label className="text-left" > ตำบล<br />
+                    <input className="input" disabled value={subdistrict} onChange={(e) => { setSubdistrictName(e?.target.value) }} />
+                  </label>
+                </div>
+              </div>
+              <div className="set-center" style={{ width: "100%", flexDirection: "row", justifyContent: "flex-end" }}>
+                <button type="reset" onClick={() => { setOpen(false) }}>ยกเลิก</button>&nbsp;&nbsp;
+                <button type="submit">บันทึก</button> 
+              </div>
+            </form>
           </div>
-          <div className="set-center" style={{ width: "100%", flexDirection: "row", justifyContent: "flex-end" }}>
-            <button type="submit"  >บันทึก</button> &nbsp;
-            <button type="button" onClick={() => { setOpen(false) }}>
-              ยกเลิก
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>}
-  </>);
+        </div>
+      )}
+    </>
+  );
 };

@@ -3,12 +3,14 @@
   min-height: 100vh;
   padding: 40px 24px;
   font-family: 'sans-serif';
+  width: 100%;
 }
 
 .page-title {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 24px;
+  margin-top: 0px;
 }
 
 .table-wrapper {
@@ -17,7 +19,7 @@
   padding: 24px;
   overflow-x: auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  min-height: 20rem;
+  /* min-height: 20rem; */
 }
 
 .activity-table {
@@ -35,10 +37,13 @@
 
 .activity-table th,
 .activity-table td {
-  padding: 16px;
+  /* padding: 16px; */
   border-bottom: 1px solid #eee;
-  background-color: transparent;
-
+  background-color: transparent; 
+}
+.activity-table td {
+   padding: 7px;
+  font-size:  .8em;
 }
 
 .activity-table th:first-child,
@@ -52,9 +57,9 @@
 
 .status-tag {
   display: inline-block;
-  padding: 6px 12px;
+  padding: .3em .8rem;
   border-radius: 999px;
-  font-size: 14px;
+  font-size: small;
   font-weight: 500;
   text-align: center;
   white-space: nowrap;

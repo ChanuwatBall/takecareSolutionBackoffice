@@ -32,7 +32,9 @@
   font-weight: 500;
   background: #eee;
 }
-
+.btn:hover{ 
+  color: #FFF !important;
+}
 .btn.blue {
   background: #003fc4;
   color: white;
@@ -118,6 +120,9 @@ th, td {
   min-width: 250px;
   max-width: 50rem;
 }
+.modal-content  form {
+  box-shadow: none;
+}
 
 .modal-content h3 {
   margin-top: 0;
@@ -125,8 +130,7 @@ th, td {
   margin-bottom: 16px;
 }
 
-.modal-content input[type="text"] , .modal-content .input {
-  width: 85%;
+.modal-content input[type="text"] , .modal-content .input { 
   margin-bottom: 12px;
   padding: 10px 12px;
   font-size: 15px;

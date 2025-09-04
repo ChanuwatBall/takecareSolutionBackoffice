@@ -4,6 +4,7 @@ import "./css/ActivityForm.css"
 import { createActivity  } from '../action';
 import { useAlert } from '../components/AlertContext';
 import Resizer from "react-image-file-resizer";
+import { useNavigate } from 'react-router-dom';
 
 const resizeFile = (file:any) =>
   new Promise((resolve) => {
@@ -30,6 +31,7 @@ type ImageData = {
 export default function ActivityForm() {
   const [images, setImages] = useState<ImageData[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const navigate = useNavigate()
 
   const [activityName , setActivityName] = useState("")
   const [activityShortname , setActivityShortName] = useState("")
@@ -93,7 +95,7 @@ useEffect(()=>{
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const savePublish=async()=>{ 
+  const savePublish=async(isDraft:any)=>{ 
     setLoading(true)
     const formData = new FormData();
     
@@ -111,6 +113,7 @@ useEffect(()=>{
    formData.append('end',end);
    formData.append('place',place);
    formData.append('termsCondition',termsCondition);
+   formData.append('isDraft',isDraft);
 
 
    for (const [key, value] of formData.entries()) {
@@ -119,16 +122,17 @@ useEffect(()=>{
     const result = await createActivity(formData);
     console.log("result ",result)
    if(result?.result){ 
-       showAlert('เพิ่มกิจกรรมสำเร็จ', 'success') 
+       showAlert('เพิ่มกิจกรรม'+(isDraft ? "แบบร่าง":"เผยแพร่")+'สำเร็จ', 'success') 
      }else{
-      showAlert('เพิ่มกิจกรรมไม่สำเร็จ',"error")
+      showAlert('เพิ่มกิจกรรม'+(isDraft ? "แบบร่าง":"เผยแพร่")+'ไม่สำเร็จ',"error")
      }
     setLoading(false)
+    navigate("/activities")
   }
 
   return ( 
-    <div className='page' style={{overflowY:"scroll"}} >
-      <div style={{ maxWidth: "1200px", margin: "0 auto",paddingTop:"2.5rem",textAlign:"left"}}>
+    <div   >
+      <div style={{ maxWidth: "1200px", margin: "0 auto",paddingTop:"2.5rem",textAlign:"left", marginBottom:"10rem"}}>
         <div  className="activity-form" style={{background:"none",padding:"none"}}>
            <label   > งานกิจกรรม</label>
         </div>
@@ -205,7 +209,7 @@ useEffect(()=>{
                     {img.isCover ? '✔ รูปปก' : 'ตั้งเป็นปก'}
                 </button>
                 <button type="button" className="remove-btn" onClick={() => handleRemove(i)}>
-                    ×
+                    X
                 </button>
                 </div>
             ))}
@@ -222,14 +226,16 @@ useEffect(()=>{
 
         <div className="form-actions">
             <button type="submit" className="btn btn-outline"
-              onClick={()=>{savePublish()}}
+              onClick={()=>{savePublish(false)}}
             >บันทึก</button>
-            <button type="button" className="btn btn-outline">บันทึกแบบร่าง</button>
+            <button type="button" className="btn btn-outline" 
+              onClick={()=>{savePublish(true)}}
+            >บันทึกแบบร่าง</button>
             {loading && <div className="spinner"></div>} &nbsp;
         </div>
-        </div> <br/><br/><br/><br/>
-
-    </div>
+        </div>
+       <br/><br/><br/><br/>
+    </div> 
     </div>
   );
 }

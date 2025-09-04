@@ -79,8 +79,9 @@ const UploadOfficerModal = ({uploadHandler}:any) => {
             style={{
                 width:"fit-content" ,
                 padding:".5rem",
-                background:"#c0edcb",
+                background:"transparent",
                 fontSize:"small" , 
+                color:"#000"
             }} 
           >
           ดาวน์โหลด Template 
@@ -117,6 +118,7 @@ const UploadOfficerModal = ({uploadHandler}:any) => {
                   <th>เบอร์โทร</th>
                   <th className='text-center' >เรื่องร้องทุกข์</th>
                   <th>สิทธิ</th>
+                  <th> </th>
                 </tr>
               </thead>
               <tbody>
@@ -128,6 +130,11 @@ const UploadOfficerModal = ({uploadHandler}:any) => {
                     <td>{o.phoneNumber}</td>
                     <td>{o.allowedTopicIds?.split(',')}</td>
                     <td>{o.role}</td>
+                    <td> 
+                      <button style={{padding:".2rem .8rem .2rem"}} >
+                        <small>DEL</small>
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -135,8 +142,8 @@ const UploadOfficerModal = ({uploadHandler}:any) => {
           </>
         )} <br/>
         <div className="modal-actions " style={{margin:"0px",marginTop:".5rem"}}>
-          <button  onClick={()=>{setOpen(false);setOfficers([])}} >ยกเลิก</button>  &nbsp; 
-          <button  type='submit' onClick={()=>handleSubmit()}  >บันทึก</button>
+          <button  type='reset' onClick={()=>{setOpen(false);setOfficers([])}} >ยกเลิก</button>  &nbsp; 
+          <button  type='submit' onClick={()=>handleSubmit()}  disabled={officers.length > 0 ? false : true}  >บันทึก</button>
         </div>
         
       </div> 

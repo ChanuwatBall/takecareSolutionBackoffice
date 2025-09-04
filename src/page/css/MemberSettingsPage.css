@@ -1,8 +1,7 @@
 .member-settings {
   padding: 40px;
-  background: #f2f2f2;
-  min-height: 100vh;
-  font-family: 'Prompt', sans-serif;
+  background: #f2f2f2; 
+  font-family: 'Prompt', sans-serif; 
 }
 
 .toolbar {
@@ -95,6 +94,12 @@ th, td {
   border: none;
   cursor: pointer;
   font-size: 18px;
+  padding: .1rem .7rem .1rem .7rem;
+}
+.icon-btn:hover > img{
+  /* color: #FFF;
+  background: #646cffaa; */
+  filter: brightness(0) saturate(100%) invert(100%) sepia(48%) saturate(1627%) hue-rotate(200deg) brightness(111%) contrast(106%);
 }
 
 /* Modal styling */
@@ -117,6 +122,7 @@ th, td {
   padding: 20px;
   min-width: 250px;
   max-width: 50rem;
+  box-shadow: none !important;
 }
 
 .modal-content h3 {
@@ -124,9 +130,11 @@ th, td {
   font-size: 20px;
   margin-bottom: 16px;
 }
+.modal-content .input {
+  padding: 0px;
+}
 
-.modal-content input[type="text"] , .modal-content .input {
-  width: 85%;
+.modal-content input[type="text"] , .modal-content .input { 
   margin-bottom: 12px;
   padding: 10px 12px;
   font-size: 15px;
@@ -139,4 +147,11 @@ th, td {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 7rem;
+}
+ 
+button[type="reset"]{
+  background:#cf6737 ;
+}
+button[type="reset"]:hover{ 
+  background:#d8774a ;
 }
