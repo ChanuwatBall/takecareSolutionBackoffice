@@ -42,6 +42,7 @@ export default function ActivityForm() {
   const [showAlert] = useAlert();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [loading , setLoading] = useState(false)
+  const [error, setError] = useState<string>("");
   
 
 //   const [imgs, setImages] = useState([]/)
@@ -81,8 +82,21 @@ useEffect(()=>{
     handleFiles(e.dataTransfer.files);
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    handleFiles(e.target.files);
+  const handleFileChange = (e:any|ChangeEvent<HTMLInputElement>) => {
+    const maxSizeMB = 2; // limit 2MB
+    const files:any = Array.from(e.target.files);
+
+    const validFiles = files.filter((file:any) => {
+      if (file.size > maxSizeMB * 1024 * 1024) {
+        setError(`❌ ${file.name} is larger than ${maxSizeMB} MB`);
+        return false;
+      }
+      return true;
+    });
+    if (validFiles.length) {
+       handleFiles(e.target.files);
+       setError("")
+    }
   };
 
   const handleSetCover = (index: number) => {
@@ -180,7 +194,7 @@ useEffect(()=>{
         </div>
 
         <div className="form-group">
-            <label>รูปที่อัปโหลด</label>
+            <label style={{display:"flex",alignItems:"center"}} >รูปที่อัปโหลด <sub>&nbsp; อัปโหลดรูปได้ไม่เกิน 2 MB</sub> </label>
             <div
             className={`upload-area ${dragActive ? 'drag-active' : ''}`}
             onDragOver={(e) => {
@@ -200,7 +214,7 @@ useEffect(()=>{
               style={{ display: 'none' }}
             />
             </div>
-
+             {error && <p style={{ color: "red", fontSize:"small" }}>{error}</p>}
             <div className="image-preview">
             {images.map((img, i) => (
                 <div key={i} className={`image-box ${img.isCover ? 'cover' : ''}`}>
@@ -210,7 +224,7 @@ useEffect(()=>{
                 </button>
                 <button type="button" className="remove-btn" onClick={() => handleRemove(i)}>
                     X
-                </button>
+                </button> 
                 </div>
             ))}
             </div>
