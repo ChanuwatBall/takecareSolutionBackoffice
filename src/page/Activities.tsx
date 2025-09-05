@@ -73,7 +73,7 @@ const Activities = () => {
     cursor: disabled ? "not-allowed" : "pointer",
   });
   const PaginationBar = () => (
-    <div style={{ display: "flex", gap: "1rem", alignItems: "center", justifyContent: "space-between", margin: "0.75rem 0"  , fontSize:"small" }}>
+    <div className="pagination-bar" style={{ display: "flex", gap: "1rem", alignItems: "center", justifyContent: "space-between", margin: "0.75rem 0"  , fontSize:"small" }}>
       <div style={{ color: "#555", fontSize: 14 }}>
         แสดง {total === 0 ? 0 : startIndex + 1}-{endIndex} จาก {total} รายการ
       </div>

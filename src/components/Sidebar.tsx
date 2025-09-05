@@ -33,7 +33,8 @@ const fetchSidebarData = async () => {
         { id: "animals", label: "สัตว์จรจัด", roles: ["admin", "user"]  ,path:"/complaint/animals" },
         { id: "maintenance", label: "ซ่อมแซม", roles: ["admin", "user"]  ,path:"/complaint/maintenance"}, 
         { id: "trees", label: "ตัดต้นไม้", roles: ["admin", "user"]  ,path:"/complaint/trees"},
-        { id: "clean", label: "ทำความสะอสด", roles: ["admin", "user"]  ,path:"/complaint/clean"},
+        { id: "clean", label: "ทำความสะอาด", roles: ["admin", "user"]  ,path:"/complaint/clean"},
+        { id: "other", label: "อื่นๆ", roles: ["admin", "user"]  ,path:"/complaint/other"},
       ],
     },  
   ]);
@@ -51,7 +52,7 @@ const Sidebar: React.FC = () => {
         { id: "animals", label: "สัตว์จรจัด", roles: ["admin", "user"]  ,path:"/complaint/animals" },
         { id: "maintenance", label: "ซ่อมแซม", roles: ["admin", "user"]  ,path:"/complaint/maintenance"}, 
         { id: "trees", label: "ตัดต้นไม้", roles: ["admin", "user"]  ,path:"/complaint/trees"},
-        { id: "clean", label: "ทำความสะอสด", roles: ["admin", "user"]  ,path:"/complaint/clean"},
+        { id: "clean", label: "ทำความสะอาด", roles: ["admin", "user"]  ,path:"/complaint/clean"},
         { id: "other", label: "อื่นๆ", roles: ["admin", "user"]  ,path:"/complaint/other"},
       ])
   const nav = useNavigate() 

@@ -199,7 +199,7 @@ const MemberSettings = () => {
   });
 
   const PaginationBar = () => (
-    <div style={{display:"flex", gap:"1rem", alignItems:"center", justifyContent:"space-between", margin:"0.5rem 0",fontSize:"small"}}>
+    <div  className="pagination-bar" style={{display:"flex", gap:"1rem", alignItems:"center", justifyContent:"space-between", margin:"0.5rem 0",fontSize:"small"}}>
       <div style={{ color: "#555", fontSize: 14 }}>
         แสดง {total === 0 ? 0 : startIndex + 1}-{endIndex} จาก {total} รายการ
       </div>
@@ -213,11 +213,11 @@ const MemberSettings = () => {
           {[5,10,20,50].map(n => <option key={n} value={n}>{n}</option>)}
         </select>
         <div style={{display:"flex", gap:6, alignItems:"center"}}>
-          <button onClick={()=>goToPage(1)} disabled={page===1} style={pgBtn(page===1)}>« First</button>
-          <button onClick={()=>goToPage(page-1)} disabled={page===1} style={pgBtn(page===1)}>‹ Prev</button>
+          <button onClick={()=>goToPage(1)} disabled={page===1} style={pgBtn(page===1)}>« ก่อนหน้า</button>
+          <button onClick={()=>goToPage(page-1)} disabled={page===1} style={pgBtn(page===1)}>‹ หน้าแรก</button>
           <span style={{ color:"#555", minWidth:90, textAlign:"center" }}>หน้า {page}/{totalPages}</span>
-          <button onClick={()=>goToPage(page+1)} disabled={page===totalPages} style={pgBtn(page===totalPages)}>Next ›</button>
-          <button onClick={()=>goToPage(totalPages)} disabled={page===totalPages} style={pgBtn(page===totalPages)}>Last »</button>
+          <button onClick={()=>goToPage(page+1)} disabled={page===totalPages} style={pgBtn(page===totalPages)}>ถัดไป ›</button>
+          <button onClick={()=>goToPage(totalPages)} disabled={page===totalPages} style={pgBtn(page===totalPages)}>สุดท้าย »</button>
         </div>
       </div>
     </div>

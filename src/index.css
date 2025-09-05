@@ -56,7 +56,8 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
-
+.pagination-bar button:hover { color: #1a1a1a !important; }
+.pagination-bar button[disabled]:hover { color: #AAAAAA !important; }
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

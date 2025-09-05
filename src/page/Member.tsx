@@ -199,7 +199,7 @@ const MemberTable = () => {
         </table>
 
         {/* Pagination footer (ซ้ำด้านล่างเพื่อความสะดวก) */}
-        <div
+        <div className="pagination-bar"
           style={{
             display: "flex",
             gap: "1rem",
