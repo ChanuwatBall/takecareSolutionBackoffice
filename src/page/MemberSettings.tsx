@@ -161,7 +161,7 @@ const MemberSettings = () => {
       username ,
       password ,
       role ,
-      topic  ,
+      allowedTopicIds:topic  ,
     }
     const result= await addMember(form)
     if(result?.result){
