@@ -8,5 +8,5 @@ services:
       - "5173:80"                           
     env_file:
       - .env.production
-    extra_hosts:
-      - "test-apitakecaresolution.attg.cc:43.249.65.230"              
+    # extra_hosts:
+    #   - "test-apitakecaresolution.attg.cc:43.249.65.230"              
