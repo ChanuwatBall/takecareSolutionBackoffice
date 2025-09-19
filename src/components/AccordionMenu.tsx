@@ -32,12 +32,7 @@ const AccordionMenu: React.FC<Props> = ({ data ,select }) => {
   };
 
   useEffect(()=>{ 
-    console.log("openVillageId ",openVillageId)
-    // setTimeout(()=>{ 
-    //     if(data.length > 0 ){  
-    //       setOpenId(id =>( id = data[0].id))
-    //     }
-    // },1000)
+    console.log("openVillageId ",openVillageId) 
   },[data])
 
   return (
@@ -73,21 +68,21 @@ const AccordionMenu: React.FC<Props> = ({ data ,select }) => {
       ))}
 
        {data.length === 1 && 
-         openId === data[0].id && (
+          
             <div style={{ paddingLeft: 24 }}>
               {data[0].villages.map((village) => (
                 <div className='village' key={village.id} style={{ marginBottom: 4 }}>
                   <span
-                    style={{ cursor: 'pointer' }}
+                     style={{ cursor: 'pointer' , fontSize:".8em" , color: "#333" }}
                     onClick={() => handleVillageToggle(village.id)}
                   >
-                     <img src="../icons/ionicons/caret-forward.svg" className={'icon-carret '} /> 
-                    {village.name}
+                     <img src="../icons/ionicons/caret-forward.svg" className={'icon-carret '} style={{width:".7rem"}} /> 
+                    {village.name} {data[0]?.subdistrict}
                   </span>
                 </div>
               ))}
             </div>
-          )} 
+          } 
     </div>
   );
 };
