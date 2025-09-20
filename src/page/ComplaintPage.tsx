@@ -1,9 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState ,useRef } from "react"; 
+import type { ChangeEvent, DragEvent } from 'react';
 import { useParams } from "react-router-dom";
 import { complaintslist, updateComplaintSts } from "../action";
 import "./css/Complaint.css"
 import { useAlert } from "../components/AlertContext";
 import { PrintExcelComplaint } from "../components/PrintExcel";
+import Resizer from "react-image-file-resizer";
 
 const apiUrl = import.meta.env.VITE_API;
 
@@ -17,6 +19,23 @@ export interface Complaint {
   topicId: number;
   imageIds: string[];
 }
+
+const resizeFile = (file:any) =>
+  new Promise((resolve) => {
+    Resizer.imageFileResizer(
+      file,
+      500,
+      1200,
+      "JPG",
+      70,
+      0,
+      (File) => {
+        resolve(File);
+      },
+      "file"
+    );
+  });
+
 
 const ComplaintPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -257,7 +276,11 @@ const viewBtnStyle: React.CSSProperties = {
 //   cursor: "pointer",
 //   color:"black"
 // };
-
+type ImageData = {
+  file: File;
+  preview: string;
+  isCover: boolean;
+};
 export type ComplaintStatusType = 'pending' | 'in-progress' | 'done';
 interface ComplaintStatusProps {
   value: ComplaintStatusType;
@@ -272,7 +295,80 @@ const STATUS_LABEL: Record<ComplaintStatusType, string> = {
 export const ComplaintStatus: React.FC<ComplaintStatusProps> = ({ value, update }) => {
   const [open, setOpen] = useState(false);
   const toggleDropdown = () => setOpen(!open);
-  const handleSelect = (status: ComplaintStatusType) => { update(status); setOpen(false); };
+  const [upload,setUpload] = useState(false)
+    const [images, setImages] = useState<ImageData[]>([]);
+    const [dragActive, setDragActive] = useState(false);
+  const [error, setError] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const succesUpload=(status: ComplaintStatusType)=>{ 
+    if(status != "done"){
+      update(status); 
+      setOpen(false); 
+    }else{
+      setUpload(true)
+    } 
+  }
+
+  const handleFiles = async (files: FileList | null) => {
+    if (!files) return;
+    console.log("file ", files) 
+   
+    const fileArray = Array.from(files);
+
+    const imageslist:any[] = await Promise.all(
+      fileArray.map(async (file) => {
+        const fileresize = await resizeFile(file);
+        return {
+          file: fileresize,
+          preview: URL.createObjectURL(file),
+          isCover: false,
+        };
+      })
+    );
+
+     console.log("imageslist ", imageslist)
+    // const newImages: ImageData[] = Array.from(files).map((file) => ({
+    //   file,
+    //   preview: URL.createObjectURL(file),
+    //   isCover: false,
+    // })); 
+    setImages((prev) => [...prev, ...imageslist]);
+  };
+
+  
+    const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setDragActive(false);
+      handleFiles(e.dataTransfer.files);
+    };
+  
+    const handleFileChange = (e:any|ChangeEvent<HTMLInputElement>) => {
+      const maxSizeMB = 2; // limit 2MB
+      const files:any = Array.from(e.target.files);
+  
+      const validFiles = files.filter((file:any) => {
+        if (file.size > maxSizeMB * 1024 * 1024) {
+          setError(`❌ ${file.name} is larger than ${maxSizeMB} MB`);
+          return false;
+        }
+        return true;
+      });
+      if (validFiles.length) {
+         handleFiles(e.target.files);
+         setError("")
+      }
+    };
+  
+    const handleSetCover = (index: number) => {
+      setImages((prev) =>
+        prev.map((img, i) => ({ ...img, isCover: i === index }))
+      );
+    };
+  
+    const handleRemove = (index: number) => {
+      setImages((prev) => prev.filter((_, i) => i !== index));
+    };
 
   return (
     <div className="complaint-status-wrapper">  
@@ -285,12 +381,61 @@ export const ComplaintStatus: React.FC<ComplaintStatusProps> = ({ value, update 
             <label>X</label>
           </div>
           {(Object.keys(STATUS_LABEL) as ComplaintStatusType[]).map((status) => (
-            <div key={status} className={`status-option ${status}`} onClick={() => handleSelect(status)}>
+            <div key={status} className={`status-option ${status}`} onClick={() => succesUpload(status)}>
               {STATUS_LABEL[status]}
             </div>
           ))}
         </div>
       )}
+      {
+        upload && <div  className="set-center" style={{background:"rgba(0,0,0,.5)",position:"fixed" , width:"100vw" , minHeight:"100vh",  zIndex: "10", overflow: "hidden", left:"0",top:"0" ,padding:"1rem"}} >
+          <div style={{
+            background:"#FFF" , width:"30rem",height:"fit-content",padding:"3rem", 
+          }} >
+            <div>
+               <button onClick={()=>{setUpload(false);}} style={{width:"1rem",padding:"0"}}>X</button>
+            </div>
+           <div className="form-group">
+            <label style={{display:"flex",alignItems:"center"}} >รูปที่อัปโหลด <sub>&nbsp; อัปโหลดรูปได้ไม่เกิน 2 MB</sub> </label>
+            <div
+            className={`upload-area ${dragActive ? 'drag-active' : ''}`}
+            onDragOver={(e) => {
+                e.preventDefault();
+                setDragActive(true);
+            }}
+            onDragLeave={() => setDragActive(false)}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            >
+            <p>ลาก & วางไฟล์ที่นี่ หรือคลิกเพื่อเลือกไฟล์</p>
+              <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+            </div>
+             {error && <p style={{ color: "red", fontSize:"small" }}>{error}</p>}
+            <div className="image-preview">
+            {images.map((img, i) => (
+                <div key={i} className={`image-box ${img.isCover ? 'cover' : ''}`}>
+                <img src={img.preview} alt={`upload-${i}`} />
+                <button type="button" onClick={() => handleSetCover(i)}>
+                    {img.isCover ? '✔ รูปปก' : 'ตั้งเป็นปก'}
+                </button>
+                <button type="button" className="remove-btn" onClick={() => handleRemove(i)}>
+                    X
+                </button> 
+                </div>
+            ))}
+            </div>
+        </div>
+        </div>
+        </div>
+      }
+
+      
     </div>
   );
 };

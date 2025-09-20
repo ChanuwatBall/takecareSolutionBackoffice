@@ -154,13 +154,14 @@ const MemberSettings = () => {
   }
 
   const submit=async ()=>{
+    console.log( " submit role ",role)
     const form ={
       name: fullname ,
       email ,
       phoneNumber: phone ,
       username ,
       password ,
-      role ,
+      role: role?role :"admin" ,
       allowedTopicIds:topic  ,
     }
     const result= await addMember(form)
@@ -213,8 +214,8 @@ const MemberSettings = () => {
           {[5,10,20,50].map(n => <option key={n} value={n}>{n}</option>)}
         </select>
         <div style={{display:"flex", gap:6, alignItems:"center"}}>
-          <button onClick={()=>goToPage(1)} disabled={page===1} style={pgBtn(page===1)}>« ก่อนหน้า</button>
-          <button onClick={()=>goToPage(page-1)} disabled={page===1} style={pgBtn(page===1)}>‹ หน้าแรก</button>
+          <button onClick={()=>goToPage(1)} disabled={page===1} style={pgBtn(page===1)}>« หน้าแรก </button>
+          <button onClick={()=>goToPage(page-1)} disabled={page===1} style={pgBtn(page===1)}>‹ ก่อนหน้า</button>
           <span style={{ color:"#555", minWidth:90, textAlign:"center" }}>หน้า {page}/{totalPages}</span>
           <button onClick={()=>goToPage(page+1)} disabled={page===totalPages} style={pgBtn(page===totalPages)}>ถัดไป ›</button>
           <button onClick={()=>goToPage(totalPages)} disabled={page===totalPages} style={pgBtn(page===totalPages)}>สุดท้าย »</button>

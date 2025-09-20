@@ -202,7 +202,7 @@ const Activities = () => {
               ))}
             </div>
             <div style={{ textAlign: 'right', marginTop: 16 }}>
-              <button onClick={() => setSelected(null)} className="btn">ปิด</button>
+              <button onClick={() => setSelected(null)} >ปิด</button>
             </div>
           </div>
         </div>

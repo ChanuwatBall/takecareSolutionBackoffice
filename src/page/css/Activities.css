@@ -114,3 +114,7 @@
 .status-dropdown div:hover {
   background-color: #f2f2f2;
 }
+
+button.link-btn:hover{
+  color: #000000aa !important;
+}

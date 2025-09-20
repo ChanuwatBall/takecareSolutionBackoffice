@@ -112,7 +112,8 @@ useEffect(()=>{
   const savePublish=async(isDraft:any)=>{ 
     setLoading(true)
     const formData = new FormData();
-    
+    const issetcover = images.find((e)=>{e?.isCover })
+    console.log("issetcover ",issetcover)
     await  images.forEach(async (img ) => {  
     
         formData.append('images', img.file);
