@@ -183,6 +183,7 @@ const ComplaintPage: React.FC = () => {
                       <td style={{...td, ...{textAlign:"center"}}}>
                         <ComplaintStatus
                           value={item.status}
+                          detail={item}
                           update={(newsts)=> updateConplaintStatus(item?.id, newsts)}
                         />
                       </td>
@@ -205,7 +206,7 @@ const ButtonViewImages = ({ complaint }: any) => {
   const [openModal , setOpenModal] = useState(false)
   const [current , setCurrent] = useState(0)
 
-  useEffect(()=>{ console.log("complaint  ", complaint) },[])
+  useEffect(()=>{   },[])
   return (
     <>
       <button style={viewBtnStyle} onClick={()=> setOpenModal(true)}>ดูรูปภาพ</button>
@@ -285,6 +286,7 @@ export type ComplaintStatusType = 'pending' | 'in-progress' | 'done';
 interface ComplaintStatusProps {
   value: ComplaintStatusType;
   update: (newStatus: ComplaintStatusType) => void;
+  detail: any
 }
 const STATUS_LABEL: Record<ComplaintStatusType, string> = {
   pending: 'รอดำเนินการ',
@@ -292,7 +294,7 @@ const STATUS_LABEL: Record<ComplaintStatusType, string> = {
   done: 'เสร็จเรียบร้อย',
 };
 
-export const ComplaintStatus: React.FC<ComplaintStatusProps> = ({ value, update }) => {
+export const ComplaintStatus: React.FC<ComplaintStatusProps> = ({ value, update ,detail }) => {
   const [open, setOpen] = useState(false);
   const toggleDropdown = () => setOpen(!open);
   const [upload,setUpload] = useState(false)
@@ -388,14 +390,23 @@ export const ComplaintStatus: React.FC<ComplaintStatusProps> = ({ value, update 
         </div>
       )}
       {
-        upload && <div  className="set-center" style={{background:"rgba(0,0,0,.5)",position:"fixed" , width:"100vw" , minHeight:"100vh",  zIndex: "10", overflow: "hidden", left:"0",top:"0" ,padding:"1rem"}} >
+        upload && <div  className="set-center"  style={{background:"rgba(0,0,0,.5)",position:"fixed" , width:"100vw" , minHeight:"100vh",  zIndex: "10", overflow: "hidden", left:"0",top:"0" ,padding:"1rem"}} >
           <div style={{
-            background:"#FFF" , width:"30rem",height:"fit-content",padding:"3rem", 
+            background:"#FFF" , width:"60%",height:"fit-content",padding:"3rem",
+            // top: "50%", left: "50%",  transform: "translate(25%, 50%)",
           }} >
-            <div>
+            <div style={{textAlign:"right"}}>
                <button onClick={()=>{setUpload(false);}} style={{width:"1rem",padding:"0"}}>X</button>
             </div>
            <div className="form-group">
+            <label className="h3 text-left">กรุณานำเข้า รูปของจุดร้องเรียนที่แก้ไขแล้ว</label><br/>
+            <ul className="text-left" style={{listStyle:"none",paddingLeft:".5rem"}}>
+              <li><b>หัวข้อ</b> {detail?.topic}</li>
+              <li><b>เรื่อง</b> {detail?.supTitle}</li>
+              <li><b>หมายเลขโทรศัพท์</b> {detail?.phone}</li>
+              <li><b>รายละเอียด</b> {detail?.detail}</li>
+            </ul>
+
             <label style={{display:"flex",alignItems:"center"}} >รูปที่อัปโหลด <sub>&nbsp; อัปโหลดรูปได้ไม่เกิน 2 MB</sub> </label>
             <div
             className={`upload-area ${dragActive ? 'drag-active' : ''}`}
@@ -420,16 +431,16 @@ export const ComplaintStatus: React.FC<ComplaintStatusProps> = ({ value, update 
             <div className="image-preview">
             {images.map((img, i) => (
                 <div key={i} className={`image-box ${img.isCover ? 'cover' : ''}`}>
-                <img src={img.preview} alt={`upload-${i}`} />
-                <button type="button" onClick={() => handleSetCover(i)}>
-                    {img.isCover ? '✔ รูปปก' : 'ตั้งเป็นปก'}
-                </button>
+                <img src={img.preview} alt={`upload-${i}`} /> 
                 <button type="button" className="remove-btn" onClick={() => handleRemove(i)}>
                     X
                 </button> 
                 </div>
             ))}
             </div>
+
+            <br/>
+            <button style={{background:"#44cf57"}}>อัพเดตเรื่องร้องเรียนเป็นสำเร็จ</button>
         </div>
         </div>
         </div>
