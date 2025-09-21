@@ -155,3 +155,12 @@ button[type="reset"]{
 button[type="reset"]:hover{ 
   background:#d8774a ;
 }
+button[role="delete"]{
+  background-color: transparent !important;
+  color: red;
+}
+button[role="delete"]:hover{
+  background-color: transparent !important;
+  border:1px solid red;
+  color: red !important;
+}

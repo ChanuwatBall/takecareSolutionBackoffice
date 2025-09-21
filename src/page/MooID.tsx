@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { decodeBase64, getVillagersByVillage, updateVillager } from "../action";
+import { decodeBase64, delVillager, getCookie, getVillagersByVillage, updateVillager } from "../action";
 import './css/Villager.css';
 import { useAlert } from "../components/AlertContext";
 import { PrintExcel } from "../components/PrintExcel";
@@ -100,25 +100,25 @@ const MooID: React.FC = () => {
     cursor: disabled ? "not-allowed" : "pointer"
   });
   const PaginationBar = () => (
-    <div  className="pagination-bar" style={{display:"flex", gap:"1rem", alignItems:"center", justifyContent:"space-between", margin:"0.75rem 0", fontSize:"small"}}>
-      <div style={{ color:"#555", fontSize:14 }}>
+    <div className="pagination-bar" style={{ display: "flex", gap: "1rem", alignItems: "center", justifyContent: "space-between", margin: "0.75rem 0", fontSize: "small" }}>
+      <div style={{ color: "#555", fontSize: 14 }}>
         แสดง {total === 0 ? 0 : startIndex + 1}-{endIndex} จาก {total} รายการ
       </div>
-      <div style={{display:"flex", gap:"0.5rem", alignItems:"center"}}>
-        <label style={{ color:"#555", fontSize:14 }}>ต่อหน้า:</label>
+      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+        <label style={{ color: "#555", fontSize: 14 }}>ต่อหน้า:</label>
         <select
           value={pageSize}
-          onChange={(e)=> setPageSize(parseInt(e.target.value,10))}
-          style={{ padding:"0.3rem 0.5rem", borderRadius:8, border:"1px solid #ddd", background:"#fff" }}
+          onChange={(e) => setPageSize(parseInt(e.target.value, 10))}
+          style={{ padding: "0.3rem 0.5rem", borderRadius: 8, border: "1px solid #ddd", background: "#fff" }}
         >
-          {[5,10,20,50].map(n=> <option key={n} value={n}>{n}</option>)}
+          {[5, 10, 20, 50].map(n => <option key={n} value={n}>{n}</option>)}
         </select>
-        <div style={{display:"flex", gap:6, alignItems:"center"}}>
-          <button onClick={()=>goToPage(1, totalPages)} disabled={page===1} style={pgBtn(page===1)}>« หน้าแรก</button>
-          <button onClick={()=>goToPage(page-1, totalPages)} disabled={page===1} style={pgBtn(page===1)}>‹ ก่อนหน้า</button>
-          <span style={{ color:"#555", minWidth:90, textAlign:"center" }}>หน้า {page}/{totalPages}</span>
-          <button onClick={()=>goToPage(page+1, totalPages)} disabled={page===totalPages} style={pgBtn(page===totalPages)}>ถัดไป ›</button>
-          <button onClick={()=>goToPage(totalPages, totalPages)} disabled={page===totalPages} style={pgBtn(page===totalPages)}>สุดท้าย »</button>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          <button onClick={() => goToPage(1, totalPages)} disabled={page === 1} style={pgBtn(page === 1)}>« หน้าแรก</button>
+          <button onClick={() => goToPage(page - 1, totalPages)} disabled={page === 1} style={pgBtn(page === 1)}>‹ ก่อนหน้า</button>
+          <span style={{ color: "#555", minWidth: 90, textAlign: "center" }}>หน้า {page}/{totalPages}</span>
+          <button onClick={() => goToPage(page + 1, totalPages)} disabled={page === totalPages} style={pgBtn(page === totalPages)}>ถัดไป ›</button>
+          <button onClick={() => goToPage(totalPages, totalPages)} disabled={page === totalPages} style={pgBtn(page === totalPages)}>สุดท้าย »</button>
         </div>
       </div>
     </div>
@@ -186,7 +186,7 @@ const MooID: React.FC = () => {
             <span style={{ fontSize: "1.5rem", color: "#aaa" }}>
               <img src="../icons/ionicons/search-outline.svg" style={{ width: "1.5rem" }} />
             </span>
-          </div><br/>
+          </div><br />
 
           {/* TOP pagination (NEW) */}
           <PaginationBar />
@@ -204,7 +204,7 @@ const MooID: React.FC = () => {
           >
             <table style={{
               width: "100%", borderCollapse: "collapse", fontSize: ".8em", borderRadius: "16px",
-              paddingBottom: "5rem" 
+              paddingBottom: "5rem"
             }}>
               <thead style={{ color: "#555", fontWeight: 500, borderBottom: "1px solid #E0E0E0" }}>
                 <tr>
@@ -215,13 +215,13 @@ const MooID: React.FC = () => {
                   <th style={thStyle} >อายุ</th>
                   <th style={thStyle} >อีเมลล์</th>
                   <th style={thStyle} >เพศ</th>
-                  <th style={{ ...thStyle, ...{ boxShadow: "-18px -5px 15px -22px rgba(0,0,0,0.1)" }}} />
+                  <th style={{ ...thStyle, ...{ boxShadow: "-18px -5px 15px -22px rgba(0,0,0,0.1)" } }} />
                 </tr>
               </thead>
               <tbody>
                 {pageItems.length === 0 ? (
                   <tr>
-                    <td colSpan={8} style={{ ...tdStyle, textAlign:"center", color:"#777" }}>
+                    <td colSpan={8} style={{ ...tdStyle, textAlign: "center", color: "#777" }}>
                       ไม่พบรายการ
                     </td>
                   </tr>
@@ -245,6 +245,7 @@ const MooID: React.FC = () => {
                           <ButtonEditMemberDialog
                             villager={v}
                             onSave={(data: any) => update(data)}
+                            updatetable={()=>getVillager()}
                           />
                         </div>
 
@@ -268,8 +269,8 @@ const MooID: React.FC = () => {
               </tbody>
             </table>
           </div>
- 
-        </div><br/><br/><br/><br/><br/>
+
+        </div><br /><br /><br /><br /><br />
       </div>
     </div>
   )
@@ -291,7 +292,20 @@ const tdStyle: React.CSSProperties = {
   borderBottom: "none"
 };
 
-const ButtonEditMemberDialog = ({ villager, onSave }: any) => {
+interface User {
+  id: number
+  name: string
+  username: string
+  password: string | any
+  email: string
+  phoneNumber: string
+  allowedTopicIds: string[]
+  companyId: number
+  role: string
+  token: string
+}
+
+const ButtonEditMemberDialog = ({ villager, onSave , updatetable }: any) => {
   const [open, setOpen] = useState(false)
   const [villId, setVillId] = useState(0)
   const [firstName, setFistName] = useState("")
@@ -306,6 +320,18 @@ const ButtonEditMemberDialog = ({ villager, onSave }: any) => {
   const [gender, setGender] = useState("")
   const [lineName, setLineName] = useState("")
   const [showAlert] = useAlert();
+  const [loading,setLoading] = useState(false)
+
+
+  const [user, setUser] = useState<User | any>(null)
+  useEffect(() => {
+
+    const usercookie = async () => {
+      const userCookie = await getCookie("user_info")
+      setUser(userCookie)
+    }
+    usercookie()
+  }, [])
 
   const assigntoform = (data: any) => {
     setVillId(data?.id)
@@ -347,7 +373,20 @@ const ButtonEditMemberDialog = ({ villager, onSave }: any) => {
     setOpen(false)
   };
 
-  useEffect(() => {}, [])
+  const deleteVillager=async(e:any,villId:any)=>{
+    e.preventDefault()
+    setLoading(true)
+    const result = await  delVillager(villId);
+    if(result?.result){ 
+      showAlert(`ลบลูกบ้านสำเร็จ`, "success")
+      setOpen(false)
+      updatetable()
+    }else{ 
+      showAlert(`ลบลูกบ้านไม่สำเร็จ`, "error")
+    }
+    setLoading(false)
+  }
+ 
 
   return (
     <>
@@ -370,7 +409,7 @@ const ButtonEditMemberDialog = ({ villager, onSave }: any) => {
 
       {open && (
         <div className="modal" style={{ zIndex: 999, top: 0 }}>
-          <div className="modal-content" style={{ width: "80vw", minHeight: "20rem", maxHeight: "90vh", overflowY: "scroll"  }}>
+          <div className="modal-content" style={{ width: "100%", minHeight: "20rem", maxHeight: "90vh", overflowY: "scroll" , borderRadius:"0px" }}>
             <label className="text-left">ดู / แก้ไขสมาชิก</label><br />
             <form onSubmit={(e) => handleSave(e)} >
               <div style={{ width: "100%", display: "flex", flexDirection: "row" }}  >
@@ -414,8 +453,16 @@ const ButtonEditMemberDialog = ({ villager, onSave }: any) => {
                 </div>
               </div>
               <div className="set-center" style={{ width: "100%", flexDirection: "row", justifyContent: "flex-end" }}>
-                <button type="reset" onClick={() => { setOpen(false) }}>ยกเลิก</button>&nbsp;&nbsp;
-                <button type="submit">บันทึก</button> 
+              
+              
+                
+                 <button type="reset" onClick={() => { setOpen(false) }}>ยกเลิก</button>&nbsp;&nbsp;
+                 <button type="submit">บันทึก</button> &nbsp;&nbsp;&nbsp;
+                
+                {user?.role.match("admin") && <div>
+                  <button  role="delete" onClick={(e)=>{deleteVillager(e,villId)}} style={{marginRight:".5rem"}}>ลบ</button>
+                </div>}
+                {loading && <div className="spinner"></div>} 
               </div>
             </form>
           </div>
@@ -424,3 +471,5 @@ const ButtonEditMemberDialog = ({ villager, onSave }: any) => {
     </>
   );
 };
+ 
+

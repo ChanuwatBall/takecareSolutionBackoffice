@@ -205,6 +205,39 @@ export async function complaintslist(topic:any) {
     return {result: false , description: error?.message}
   }
 }
+export const delVillager=async(id:any)=>{
+try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.post( "villager/delete" , {id:id} , {  
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return {result: false , description: error?.message}
+  }
+}
+export async function complaintFinish(body:any) {
+ try {
+    const token = await getCookie("auth_token")
+    console.log("token ",token)
+    const response = await api.post( "complaint/finish" , body , {  
+      headers: { 
+        token: "Basic "+token
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('POST failed:', error.message);
+    return {result: false , description: error?.message}
+  }
+}
+
 
 export async function lastcomplaint() {
  try {

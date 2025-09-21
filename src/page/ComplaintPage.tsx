@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState ,useRef } from "react"; 
 import type { ChangeEvent, DragEvent } from 'react';
 import { useParams } from "react-router-dom";
-import { complaintslist, updateComplaintSts } from "../action";
+import { complaintFinish, complaintslist, updateComplaintSts } from "../action";
 import "./css/Complaint.css"
 import { useAlert } from "../components/AlertContext";
 import { PrintExcelComplaint } from "../components/PrintExcel";
 import Resizer from "react-image-file-resizer";
+import { PhotoView } from "react-photo-view";
 
 const apiUrl = import.meta.env.VITE_API;
 
@@ -51,6 +52,7 @@ const ComplaintPage: React.FC = () => {
 
   const getComplaints = async () => {
     const data = await complaintslist(id);
+    console.log("Complaints data ",data)
     setComplaints(data || []);
   };
 
@@ -212,31 +214,48 @@ const ButtonViewImages = ({ complaint }: any) => {
       <button style={viewBtnStyle} onClick={()=> setOpenModal(true)}>ดูรูปภาพ</button>
       {openModal && (
         <div className="modal">
-          <div className="modal-content" style={{width:"70vw"}}>
-            <h3 style={{margin:"0px"}}>เรื่องร้องเรียน</h3>
-            <label>{complaint?.supTitle}</label><br/>
-            <div className="contetnt" style={{display:"flex", flexDirection:"row"}}>
-              <div className="set-center" style={{width:"30%",height:"60vh",overflow:"scroll",paddingTop:"5rem"}}>
-                {complaint?.imageIds.map((image:any, i:any)=>
-                  <img key={i}
-                    src={apiUrl+`/api/file/drive-image/${image}`}
-                    alt={`complaint-images-${i}`}
-                    style={{height:"8rem",padding:".3rem"}}
-                    onClick={()=> setCurrent(i)}
-                  />
-                )}
-              </div>
-              <div style={{width:"70%"}} className="set-center">
-                <img
-                  src={apiUrl+`/api/file/drive-image/${complaint?.imageIds[current]}`}
-                  alt={`complaint-images-${current}`}
-                  style={{width:"auto", maxWidth:"100%", maxHeight:"50vh"}}
-                />
-              </div>
+          <div className="modal-content" style={{width:"70vw",overflow:"scroll",maxWidth:"50rem",maxHeight:"80vh" ,borderRadius:"0px" }}>
+           <div> 
+           <div className="set-center"  style={{flexDirection:"row", justifyContent:"space-between"}}>
+              <div> 
+                <h3 style={{margin:"0px"}}>เรื่องร้องเรียน</h3>
+                <label>{complaint?.supTitle}</label>
+                <label>{complaint?.detail}</label>
+              </div  >
+             <button type="button" onClick={() => setOpenModal(false)}>ปิด</button>
+           </div>
+           <br/>
+            <div  className="set-center" style={{flexDirection:"row",justifyContent:"flex-start",alignItems:"flex-start"}} > 
+
+           <div style={{width:"50%",height:"100%"}} >
+            
+           <label>รูปร้องเรียน</label>
+           <div className="set-center" style={{flexDirection:"row",justifyContent:"flex-start"}} > 
+                {complaint?.imageIds.map((image:any, i:any)=> 
+                  <div style={{  width:"20%" }} >
+                  <PhotoView src={apiUrl+`/api/file/drive-image/${image}`} >
+                     <img src={apiUrl+`/api/file/drive-image/${image}`} alt="" style={{width:"90%"}}/>
+                  </PhotoView>
+                  </div>
+                )}   
+            </div> 
             </div>
-            <div className="modal-actions" style={{margin:"0px"}}>
-              <button type="button" onClick={() => setOpenModal(false)}>ปิด</button>
-            </div>
+            
+            <div  style={{width:"50%",height:"100%"}} > 
+                         <label>รูปของจุดร้องเรียนที่แก้ไขแล้ว</label> 
+            <div className="set-center" style={{flexDirection:"row",justifyContent:"flex-start"}} > 
+                {complaint?.successImage.map((image:any, i:any)=> 
+                  <div style={{  width:"20%" }} >
+                  <PhotoView src={apiUrl+`/api/file/drive-image/${image}`} >
+                     <img src={apiUrl+`/api/file/drive-image/${image}`} alt="" style={{width:"90%"}}/>
+                  </PhotoView>
+                  </div>
+                )} 
+            </div>   
+           </div>
+           </div>
+
+           </div>
           </div>
         </div>
       )}
@@ -298,10 +317,12 @@ export const ComplaintStatus: React.FC<ComplaintStatusProps> = ({ value, update 
   const [open, setOpen] = useState(false);
   const toggleDropdown = () => setOpen(!open);
   const [upload,setUpload] = useState(false)
-    const [images, setImages] = useState<ImageData[]>([]);
-    const [dragActive, setDragActive] = useState(false);
+  const [images, setImages] = useState<ImageData[]>([]);
+  const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [loading,setLoading] = useState(false)
+  const [showAlert] = useAlert();
 
   const succesUpload=(status: ComplaintStatusType)=>{ 
     if(status != "done"){
@@ -328,13 +349,7 @@ export const ComplaintStatus: React.FC<ComplaintStatusProps> = ({ value, update 
         };
       })
     );
-
-     console.log("imageslist ", imageslist)
-    // const newImages: ImageData[] = Array.from(files).map((file) => ({
-    //   file,
-    //   preview: URL.createObjectURL(file),
-    //   isCover: false,
-    // })); 
+ 
     setImages((prev) => [...prev, ...imageslist]);
   };
 
@@ -362,15 +377,28 @@ export const ComplaintStatus: React.FC<ComplaintStatusProps> = ({ value, update 
       }
     };
   
-    const handleSetCover = (index: number) => {
-      setImages((prev) =>
-        prev.map((img, i) => ({ ...img, isCover: i === index }))
-      );
-    };
-  
     const handleRemove = (index: number) => {
       setImages((prev) => prev.filter((_, i) => i !== index));
     };
+
+    const finishComplaint=async ()=>{ 
+      setLoading(true)
+      const formData = new FormData();
+      await images.map((file)=>{ 
+        formData.append('files', file?.file);
+      })
+      formData.append("complaintId",detail?.id )
+      const result = await complaintFinish(formData)
+      if(result.result){
+        setUpload(false) 
+        update("done"); 
+        setOpen(false); 
+        setImages([])
+      }else{
+        showAlert('อัปเดสถานะ ไม่สำเร็จ', "error");
+      }
+      setLoading(false)
+    }
 
   return (
     <div className="complaint-status-wrapper">  
@@ -396,7 +424,7 @@ export const ComplaintStatus: React.FC<ComplaintStatusProps> = ({ value, update 
             // top: "50%", left: "50%",  transform: "translate(25%, 50%)",
           }} >
             <div style={{textAlign:"right"}}>
-               <button onClick={()=>{setUpload(false);}} style={{width:"1rem",padding:"0"}}>X</button>
+               <button onClick={()=>{setUpload(false);setImages([])}} style={{width:"1rem",padding:"0"}}>X</button>
             </div>
            <div className="form-group">
             <label className="h3 text-left">กรุณานำเข้า รูปของจุดร้องเรียนที่แก้ไขแล้ว</label><br/>
@@ -409,7 +437,7 @@ export const ComplaintStatus: React.FC<ComplaintStatusProps> = ({ value, update 
 
             <label style={{display:"flex",alignItems:"center"}} >รูปที่อัปโหลด <sub>&nbsp; อัปโหลดรูปได้ไม่เกิน 2 MB</sub> </label>
             <div
-            className={`upload-area ${dragActive ? 'drag-active' : ''}`}
+            className={`upload-area ${dragActive ? 'drag-active' : ''}`} style={{maxWidth:"1200px"}}
             onDragOver={(e) => {
                 e.preventDefault();
                 setDragActive(true);
@@ -440,10 +468,16 @@ export const ComplaintStatus: React.FC<ComplaintStatusProps> = ({ value, update 
             </div>
 
             <br/>
-            <button style={{background:"#44cf57"}}>อัพเดตเรื่องร้องเรียนเป็นสำเร็จ</button>
+            <div className="set-center" style={{flexDirection:"row"}} >
+              <button style={{background:"#44cf57"}} onClick={()=>{finishComplaint()}} > 
+                &nbsp; อัพเดตเรื่องร้องเรียนเป็นสำเร็จ &nbsp;
+              </button>
+              {loading && <div className="spinner"></div>}  
+            </div>
+          
         </div>
         </div>
-        </div>
+      </div>
       }
 
       
@@ -452,3 +486,5 @@ export const ComplaintStatus: React.FC<ComplaintStatusProps> = ({ value, update 
 };
 
 export default ComplaintPage;
+ 
+
