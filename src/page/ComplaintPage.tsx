@@ -206,7 +206,7 @@ const ComplaintPage: React.FC = () => {
 
 const ButtonViewImages = ({ complaint }: any) => {
   const [openModal , setOpenModal] = useState(false)
-  const [current , setCurrent] = useState(0)
+  // const [current , setCurrent] = useState(0)
 
   useEffect(()=>{   },[])
   return (
@@ -232,7 +232,7 @@ const ButtonViewImages = ({ complaint }: any) => {
            <label>รูปร้องเรียน</label>
            <div className="set-center" style={{flexDirection:"row",justifyContent:"flex-start"}} > 
                 {complaint?.imageIds.map((image:any, i:any)=> 
-                  <div style={{  width:"20%" }} >
+                  <div key={i} style={{  width:"20%" }} >
                   <PhotoView src={apiUrl+`/api/file/drive-image/${image}`} >
                      <img src={apiUrl+`/api/file/drive-image/${image}`} alt="" style={{width:"90%"}}/>
                   </PhotoView>
@@ -245,7 +245,7 @@ const ButtonViewImages = ({ complaint }: any) => {
                          <label>รูปของจุดร้องเรียนที่แก้ไขแล้ว</label> 
             <div className="set-center" style={{flexDirection:"row",justifyContent:"flex-start"}} > 
                 {complaint?.successImage.map((image:any, i:any)=> 
-                  <div style={{  width:"20%" }} >
+                  <div key={i} style={{  width:"20%" }} >
                   <PhotoView src={apiUrl+`/api/file/drive-image/${image}`} >
                      <img src={apiUrl+`/api/file/drive-image/${image}`} alt="" style={{width:"90%"}}/>
                   </PhotoView>
