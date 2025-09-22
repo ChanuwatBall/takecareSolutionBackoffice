@@ -4,6 +4,7 @@ import { useAlert } from '../components/AlertContext';
 import Alert from '../components/Alert';
 import UploadOfficerModal from '../components/UploadOfficerModal';
 import './css/MemberSettingsPage.css';
+import Select from 'react-select'
 
 const columns = [
   { key: 'name', label: 'ชื่อ-นามสกุล' },
@@ -26,10 +27,10 @@ const complaintTitile = [
   {value: "clean" , label:"ความสะอาด"},
   {value: "other", label:"อื่นๆ"}
 ]
-const roles = [
-  {value:"admin" , label:"Admin"},
-  {value:"user" , label:"User"},
-]
+// const roles = [
+//   {value:"admin" , label:"Admin"},
+//   {value:"user" , label:"User"},
+// ]
 interface Member{
   id:  number
   name: string
@@ -60,12 +61,13 @@ const MemberSettings = () => {
   const [phone , setPhone] = useState("")
   const [username , setUsername] = useState("")
   const [password , setPassword] = useState("")
-  const [role , setRole] = useState("")
+  const [role , setRole] = useState<any>({ value: 'admin', label: 'Admin' })
   const [topic  , setTopic] = useState<any[]>([])
 
   // --- NEW: Pagination state ---
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5); // 5/10/20/50
+  const roleOpts:any[] =[{ value: 'super_admin', label: 'Super Admin' },{ value: 'admin', label: 'Admin' },{ value: 'user', label: 'User' }]
 
   const [showAlert] = useAlert();
 
@@ -134,13 +136,15 @@ const MemberSettings = () => {
     }
   }
 
-  const setupForm=(member:Member)=>{
+  const setupForm=async(member:Member)=>{
     setFullName(member?.name)
     setEmail(member?.email)
     setPhone(member?.phoneNumber)
     setUsername(member?.username)
     setPassword(member?.password)
-    setRole(member?.role)
+    const usrrole = await roleOpts.find((e)=> e.value ===member?.role)
+    console.log("usrrole ",usrrole)
+    setRole(usrrole)
     setTopic(member?.allowedTopicIds)
   }
   const clearForm=()=>{
@@ -161,7 +165,7 @@ const MemberSettings = () => {
       phoneNumber: phone ,
       username ,
       password ,
-      role: role?role :"admin" ,
+      role: role?role?.value :"admin" ,
       allowedTopicIds:topic  ,
     }
     const result= await addMember(form)
@@ -311,45 +315,45 @@ const MemberSettings = () => {
           </tbody>
         </table>
       </div> <br/><br/><br/><br/><br/><br/>
-
-      {/* NEW: bottom pagination */}
-      {/* <PaginationBar /> */}
+ 
 
       {showAddModal && (
         <div className="modal">
           <div className="modal-content">
             <h3>{fullname ? "แก้ไข" :"เพิ่ม" }เจ้าหน้าที่</h3>
-            <div style={{textAlign:"left",width:"35rem"}} >
-              <input className="input" placeholder="ชื่อ-นามสกุล" type="text" value={fullname} onChange={(e:any)=>{setFullName(e.target.value) }} />
-              <input className="input" placeholder="Email" type="text" value={email} onChange={(e:any)=>{setEmail(e.target.value)}} />
-              <input className="input" placeholder="Phone Number" type="tel" maxLength={10}  value={phone} onChange={(e:any)=>{setPhone(e.target.value)}} />
-              <input className="input" placeholder="Username" type="text" value={username} onChange={(e:any)=>{setUsername(e.target.value)}}  />
-              <input  className="input" placeholder="Password" type="text"  value={password} onChange={(e:any)=>{setPassword(e.target.value)}}  />
-
-              <select className='input' aria-placeholder='Role' style={{width:"92%" }} value={role} onChange={(e)=>{setRole(e.target.value)}}>
-                {roles.map((r:any, index:any)=>  <option key={index} value={r.value}> { r.label } </option>) }
-              </select>
-
-              <label className='text-left' style={{marginLeft:"1rem",fontSize:".9em"}}>Allowed Topics</label>
-
-              <div style={{width:"100%" , padding:"0 .5rem 0 .5rem"}} >
-                {topicChoise.map((e:any,index:any)=> (
-                  <div key={index} style={{textAlign:"left", float:"left" ,padding:"0 .5rem 0 .5rem"}}>
-                    <input
-                      type="checkbox"
-                      checked={topic.includes(e.value)}
-                      onChange={() => handleChange(e.value)}
-                    />  {e.label}
-                  </div>
-                ))}
+            <div className='set-center' style={{textAlign:"left", flexDirection:"row",justifyContent:"flex-start",alignItems:"flex-start"}} >
+              <div style={{width:"50%"}}>
+                <input className="input" placeholder="ชื่อ-นามสกุล" type="text" value={fullname} onChange={(e:any)=>{setFullName(e.target.value) }} />
+                <input className="input" placeholder="Email" type="text" value={email} onChange={(e:any)=>{setEmail(e.target.value)}} />
+                <input className="input" placeholder="Phone Number" type="tel" maxLength={10}  value={phone} onChange={(e:any)=>{setPhone(e.target.value)}} />
+                <input className="input" placeholder="Username" type="text" value={username} onChange={(e:any)=>{setUsername(e.target.value)}}  />
+                <input  className="input" placeholder="Password" type="text"  value={password} onChange={(e:any)=>{setPassword(e.target.value)}}  />
               </div>
+              <div style={{width:"50%"}}>
+
+                <Select  value={role}  options={roleOpts} onChange={(e)=>{setRole(e); console.log(" setRole ",e)}} /><br/>
+                <label className='text-left' style={{marginLeft:"1rem",fontSize:".9em"}}>Allowed Topics</label>
+
+                <div style={{width:"100%" , padding:"0 .5rem 0 .5rem"}} >
+                  {topicChoise.map((e:any,index:any)=> (
+                    <div key={index} style={{textAlign:"left", float:"left" ,padding:"0 .5rem 0 .5rem"}}>
+                      <input
+                        type="checkbox"
+                        checked={topic.includes(e.value)}
+                        onChange={() => handleChange(e.value)}
+                      />  {e.label}
+                    </div>
+                  ))}
+                </div>
+              </div>
+             
+            </div>
               <div className="modal-actions">
                 <button type="reset" onClick={() =>{clearForm(); setShowAddModal(false) }}>
                   ยกเลิก
                 </button>
                 <button type="submit" onClick={()=>{submit() }} >บันทึก</button>
               </div>
-            </div>
           </div>
         </div>
       )}
