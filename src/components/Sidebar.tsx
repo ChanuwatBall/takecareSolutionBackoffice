@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import "./css/Sidebar.css";
 import { useNavigate } from "react-router-dom";
-import { deleteCookie, encodeBase64, getCookie, getMemberdetail, getSubdistrict } from "../action";
+import { deleteCookie, encodeBase64, getComplaintmenu, getCookie, getMemberdetail, getSubdistrict } from "../action";
 import AccordionMenu from "./AccordionMenu";
 
   
@@ -44,17 +44,7 @@ const Sidebar: React.FC = () => {
   const [menuData ] = useState<any[]>([]);
   const [tumbonMooMember,setTumbonMooMember] = useState([])
  
-  const [complaintMenu ,setComplaintMenu] = useState([
-        { id: "road", label: "ถนน", roles: ["admin", "user"]  ,path:"/complaint/road"},
-        { id: "water", label: "ประปา", roles: ["admin", "user"]  ,path:"/complaint/water"},
-        { id: "trash", label: "ขยะ", roles: ["admin", "user", "user"]  ,path:"/complaint/trash"},
-        { id: "heat", label: "เหตุเดือดร้อน / รำคาญ", roles: ["admin", "user"]  ,path:"/complaint/heat"}, 
-        { id: "animals", label: "สัตว์จรจัด", roles: ["admin", "user"]  ,path:"/complaint/animals" },
-        { id: "maintenance", label: "ซ่อมแซม", roles: ["admin", "user"]  ,path:"/complaint/maintenance"}, 
-        { id: "trees", label: "ตัดต้นไม้", roles: ["admin", "user"]  ,path:"/complaint/trees"},
-        { id: "clean", label: "ทำความสะอาด", roles: ["admin", "user"]  ,path:"/complaint/clean"},
-        { id: "other", label: "อื่นๆ", roles: ["admin", "user"]  ,path:"/complaint/other"},
-      ])
+  const [complaintMenu ,setComplaintMenu] = useState([ ])
   const nav = useNavigate() 
 
   useEffect(() => {
@@ -66,7 +56,10 @@ const Sidebar: React.FC = () => {
       const user = await getMemberdetail() //getCookie("user_info")
       
       
-      const filtered = complaintMenu.filter((menu)=> user?.allowedTopicIds.includes(menu?.id))
+      const menulist = await getComplaintmenu()
+      setComplaintMenu(menulist)
+
+      const filtered = menulist.filter((menu:any)=> user?.allowedTopicIds.includes(menu?.val))
       console.log("filtered ",filtered)
       setComplaintMenu(filtered);
     });

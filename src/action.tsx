@@ -30,6 +30,18 @@ export const getDefaultCompay=async()=>{
     })
 }
 
+export const getComplaintmenu=async()=>{
+        console.log("apiUrl   ",apiUrl)
+        console.log("token   ",token) 
+    return await api.get("complaintmenu").then((res)=>{
+        console.log("complaintmenu res ",res)
+        return res.data
+    }).catch((err)=>{
+        console.log("complaintmenu err ",err)
+        return null
+    })
+}
+
 
 export async function login ({  username ,  password , company }:any){
   try {
