@@ -1,5 +1,5 @@
 import  { useEffect, useMemo, useState } from 'react';
-import { addMember, deleteMember, getMembers, uploadMember } from '../action';
+import { addMember, deleteMember, getComplaintmenu, getMembers, uploadMember } from '../action';
 import { useAlert } from '../components/AlertContext';
 import Alert from '../components/Alert';
 import UploadOfficerModal from '../components/UploadOfficerModal';
@@ -16,15 +16,7 @@ const columns = [
   { key: 'allowedTopicIds', label: 'หัวข้อร้องเรียน', hidden: true }
 ];
 
-const complaintTitile = [
-  {value:"trash" , label:"ขยะ"},
-  {value:"road"  , label:"ถนน"},
-  {value: "water" , label:"น้ำประปา"},
-  {value:"heat" , label:"เหตุเดือดร้อน / รำคาญ"},
-  {value:"animals" , label:"สัตว์จรจัด"},
-  {value:"maintenance" , label:"ซ่อมแซม"},
-  {value: "trees" , label:"ตัดต้นไม้"},
-  {value: "clean" , label:"ความสะอาด"},
+const complaintTitile = [ 
   {value: "other", label:"อื่นๆ"}
 ]
 // const roles = [
@@ -52,7 +44,7 @@ const MemberSettings = () => {
   const [filter,setFilter] = useState(false)
 
   const [member,setMember] = useState<Member | null>(null)
-  const [topicChoise  ] = useState(complaintTitile)
+  const [topicChoise , setTopiChoice ] = useState(complaintTitile)
   const [isOpen ,setIsOpen ] = useState(false)
   const [message ,setMessage ] = useState("")
 
@@ -75,6 +67,11 @@ const MemberSettings = () => {
     const members = await getMembers()
     console.log("members ",members)
     setMembers(members)
+
+    const menulist = await getComplaintmenu()
+    console.log("menulist ",menulist)
+    const optsTopic = await menulist.map((e:any)=>({value:e.val,label:e.label}))
+    setTopiChoice(optsTopic)
   }
 
   useEffect(()=>{
@@ -251,7 +248,7 @@ const MemberSettings = () => {
         <div style={{ display:"flex", justifyContent: "space-between" ,alignItems:"flex-start"}} >
           <UploadOfficerModal uploadHandler={(data:any)=>{uploadofficer(data)}} /> &nbsp;
           <div className="dropdown">
-            <button className="btn text-black" onClick={()=>{setFilter(prev => prev = !prev)}}>กรอง ▾</button>
+            <button className="btn text-black" onClick={()=>{setFilter(prev => prev = !prev)}}>คอลัมน์ ▾</button>
             { filter && <div className="dropdown-content">
               {columns.map((col) => (
                 <div key={col.key} className='text-left'>
@@ -331,12 +328,12 @@ const MemberSettings = () => {
               </div>
               <div style={{width:"50%"}}>
 
-                <Select  value={role}  options={roleOpts} onChange={(e)=>{setRole(e); console.log(" setRole ",e)}} /><br/>
-                <label className='text-left' style={{marginLeft:"1rem",fontSize:".9em"}}>Allowed Topics</label>
+                <Select placeholder="สิทธิเข้าใช้งาน"  value={role}  options={roleOpts} onChange={(e)=>{setRole(e); console.log(" setRole ",e)}} /><br/>
+                <label className='text-left' style={{marginLeft:"1rem",fontSize:".9em"}}>หัวข้อร้องเรียน</label>
 
                 <div style={{width:"100%" , padding:"0 .5rem 0 .5rem"}} >
                   {topicChoise.map((e:any,index:any)=> (
-                    <div key={index} style={{textAlign:"left", float:"left" ,padding:"0 .5rem 0 .5rem"}}>
+                    <div key={index} style={{textAlign:"left", float:"left" ,padding:"0 .5rem 0 .5rem",width:"50%"}} >
                       <input
                         type="checkbox"
                         checked={topic.includes(e.value)}
