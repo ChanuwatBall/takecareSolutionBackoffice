@@ -221,6 +221,7 @@ const ButtonViewImages = ({ complaint }: any) => {
                 <h3 style={{margin:"0px"}}>เรื่องร้องเรียน</h3>
                 <label>{complaint?.supTitle}</label>
                 <label>{complaint?.detail}</label>
+                <label>แผนที่: <a href={complaint?.googleMap}  target="_blank" > Google Map</a></label>
               </div  >
              <button type="button" onClick={() => setOpenModal(false)}>ปิด</button>
            </div>
